@@ -1,4 +1,17 @@
 defmodule OrganizationManagementSystemWeb.UserAuth do
+  @moduledoc """
+  Handles user authentication and session management for the  application.
+
+  This module provides plug helpers and functions for:
+    * Logging users in and out, including session and "remember me" cookie management
+    * Fetching and assigning the current authenticated user or scope to the connection or LiveView socket
+    * Enforcing authentication requirements for protected routes and LiveViews
+    * Supporting secure session renewal and token reissuing
+    * Integrating with Phoenix LiveView authentication flows
+
+  Use this module in your router and controllers to ensure secure, consistent authentication behavior across the application.
+  """
+
   use OrganizationManagementSystemWeb, :verified_routes
 
   import Plug.Conn

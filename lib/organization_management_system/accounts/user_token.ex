@@ -1,4 +1,8 @@
 defmodule OrganizationManagementSystem.Accounts.UserToken do
+  @moduledoc """
+  A schema for user tokens.
+  """
+
   use Ecto.Schema
   import Ecto.Query
   alias OrganizationManagementSystem.Accounts.UserToken

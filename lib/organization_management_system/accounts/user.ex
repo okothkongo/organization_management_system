@@ -1,4 +1,8 @@
 defmodule OrganizationManagementSystem.Accounts.User do
+  @moduledoc """
+  A schema for users.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 

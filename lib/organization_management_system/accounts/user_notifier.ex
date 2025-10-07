@@ -1,4 +1,8 @@
 defmodule OrganizationManagementSystem.Accounts.UserNotifier do
+  @moduledoc """
+  A module for delivering user notifications.
+  """
+
   import Swoosh.Email
 
   alias OrganizationManagementSystem.Mailer
