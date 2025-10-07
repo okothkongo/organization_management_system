@@ -9,3 +9,12 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+alias OrganizationManagementSystem.Repo
+alias OrganizationManagementSystem.Accounts.User
+
+Repo.insert!(%User{
+  email: "admin@example.com",
+  name: "Super Admin",
+  status: :approved,
+  is_super_user?: true
+})

@@ -14,6 +14,7 @@ defmodule OrganizationManagementSystem.Accounts.User do
     field :authenticated_at, :utc_datetime, virtual: true
     field :name, :string
     field :status, Ecto.Enum, values: [:invited, :reviewed, :approved], default: :invited
+    field :is_super_user?, :boolean, default: false
 
     timestamps(type: :utc_datetime)
   end
@@ -31,9 +32,9 @@ defmodule OrganizationManagementSystem.Accounts.User do
   """
   def email_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :name, :status])
+    |> cast(attrs, [:email, :name, :status, :is_super_user?])
     |> validate_email(opts)
-    |> validate_required([:name, :status])
+    |> validate_required([:name, :status, :is_super_user?])
   end
 
   defp validate_email(changeset, opts) do
