@@ -16,6 +16,5 @@ Repo.insert!(%User{
   email: "admin@example.com",
   name: "Super Admin",
   status: :approved,
-  is_super_user?: true,
-  confirmed_at: DateTime.utc_now(:second)
+  is_super_user?: true
 })
