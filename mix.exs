@@ -10,6 +10,13 @@ defmodule OrganizationManagementSystem.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
       listeners: [Phoenix.CodeReloader]
     ]
@@ -66,7 +73,8 @@ defmodule OrganizationManagementSystem.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.18", only: :test}
     ]
   end
 
@@ -94,7 +102,8 @@ defmodule OrganizationManagementSystem.MixProject do
         "phx.digest"
       ],
       lint: ["format --check-formatted", "compile --warnings-as-errors --force", "credo --strict"],
-      precommit: ["deps.unlock --unused", "format", "lint", "test"]
+      cover: ["cmd MIX_ENV=test mix coveralls"],
+      precommit: ["deps.unlock --unused", "format", "lint", "test", "cover"]
     ]
   end
 end
