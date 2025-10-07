@@ -8,6 +8,8 @@ defmodule OrganizationManagementSystem.Repo.Migrations.CreateUsersAuthTables do
       add :email, :citext, null: false
       add :hashed_password, :string
       add :confirmed_at, :utc_datetime
+      add :name, :string, null: false
+      add :status, :string, null: false
 
       timestamps(type: :utc_datetime)
     end

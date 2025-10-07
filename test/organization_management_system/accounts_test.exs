@@ -79,6 +79,7 @@ defmodule OrganizationManagementSystem.AccountsTest do
 
     test "registers users without password" do
       email = unique_user_email()
+
       {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
       assert user.email == email
       assert is_nil(user.hashed_password)
@@ -109,7 +110,7 @@ defmodule OrganizationManagementSystem.AccountsTest do
   describe "change_user_email/3" do
     test "returns a user changeset" do
       assert %Ecto.Changeset{} = changeset = Accounts.change_user_email(%User{})
-      assert changeset.required == [:email]
+      assert changeset.required == [:name, :status, :email]
     end
   end
 

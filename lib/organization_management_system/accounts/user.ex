@@ -8,6 +8,8 @@ defmodule OrganizationManagementSystem.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
+    field :name, :string
+    field :status, Ecto.Enum, values: [:invited, :reviewed, :approved], default: :invited
 
     timestamps(type: :utc_datetime)
   end
@@ -25,8 +27,9 @@ defmodule OrganizationManagementSystem.Accounts.User do
   """
   def email_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email])
+    |> cast(attrs, [:email, :name, :status])
     |> validate_email(opts)
+    |> validate_required([:name, :status])
   end
 
   defp validate_email(changeset, opts) do

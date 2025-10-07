@@ -24,12 +24,19 @@ defmodule OrganizationManagementSystemWeb.UserLive.Registration do
 
         <.form for={@form} id="registration_form" phx-submit="save" phx-change="validate">
           <.input
-            field={@form[:email]}
-            type="email"
-            label="Email"
+            field={@form[:name]}
+            type="text"
+            label="Name"
             autocomplete="username"
             required
             phx-mounted={JS.focus()}
+          />
+          <.input
+            field={@form[:email]}
+            type="email"
+            label="Email"
+            autocomplete="useremail"
+            required
           />
 
           <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
