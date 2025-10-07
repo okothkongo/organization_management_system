@@ -65,7 +65,8 @@ defmodule OrganizationManagementSystem.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -82,13 +83,18 @@ defmodule OrganizationManagementSystem.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["compile", "tailwind organization_management_system", "esbuild organization_management_system"],
+      "assets.build": [
+        "compile",
+        "tailwind organization_management_system",
+        "esbuild organization_management_system"
+      ],
       "assets.deploy": [
         "tailwind organization_management_system --minify",
         "esbuild organization_management_system --minify",
         "phx.digest"
       ],
-      precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test"]
+      lint: ["format --check-formatted", "compile --warnings-as-errors --force", "credo --strict"],
+      precommit: ["deps.unlock --unused", "format", "lint", "test"]
     ]
   end
 end
