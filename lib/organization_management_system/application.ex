@@ -10,7 +10,8 @@ defmodule OrganizationManagementSystem.Application do
     children = [
       OrganizationManagementSystemWeb.Telemetry,
       OrganizationManagementSystem.Repo,
-      {DNSCluster, query: Application.get_env(:organization_management_system, :dns_cluster_query) || :ignore},
+      {DNSCluster,
+       query: Application.get_env(:organization_management_system, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: OrganizationManagementSystem.PubSub},
       # Start a worker by calling: OrganizationManagementSystem.Worker.start_link(arg)
       # {OrganizationManagementSystem.Worker, arg},
