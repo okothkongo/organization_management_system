@@ -110,7 +110,7 @@ defmodule OrganizationManagementSystem.AccountsTest do
   describe "change_user_email/3" do
     test "returns a user changeset" do
       assert %Ecto.Changeset{} = changeset = Accounts.change_user_email(%User{})
-      assert changeset.required == [:name, :status, :email]
+      assert changeset.required == [:name, :status, :is_super_user?, :email]
     end
   end
 
