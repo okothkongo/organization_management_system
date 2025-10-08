@@ -151,4 +151,62 @@ defmodule OrganizationManagementSystemWeb.Layouts do
     </div>
     """
   end
+
+  @doc """
+  Renders the authenticated sidebar navigation for logged-in users.
+
+  This sidebar is styled to match the project's theme and uses Tailwind CSS classes.
+  It adapts to the current user's role (admin or not) and displays relevant navigation links.
+  """
+  attr :current_scope, :map, required: true
+
+  def authenticated_navbar(assigns) do
+    ~H"""
+    <!-- Static sidebar for desktop -->
+    <aside class="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col z-30">
+      <div class="flex grow flex-col overflow-y-auto bg-primary-900 pt-5 border-r border-base-300 shadow-lg">
+        <div class="flex shrink-0 items-center px-4">
+          <img src={~p"/images/logo.svg"} width="36" class="h-8 w-auto" />
+          <span class="ml-2 text-xl font-bold text-white tracking-tight">LandRegistry</span>
+        </div>
+        <nav
+          aria-label="Sidebar"
+          class="mt-6 flex flex-1 flex-col divide-y divide-primary-800 overflow-y-auto"
+        >
+          <div class="space-y-1 px-2">
+            <%= if @current_scope && Map.get(@current_scope.user, :is_super_user?, false) do %>
+              <.link
+                navigate={~p"/dashboard"}
+                aria-current="page"
+                class={[
+                  "group flex items-center rounded-md px-2 py-2 text-sm font-medium",
+                  "bg-primary-800 text-white"
+                ]}
+              >
+                <.icon name="hero-home" class="mr-4 size-6 shrink-0 text-primary-200" /> Dashboard
+              </.link>
+              <.link
+                navigate={~p"/roles"}
+                class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
+              >
+                <.icon name="hero-users" class="mr-4 size-6 shrink-0 text-primary-200" /> Roles
+              </.link>
+            <% else %>
+              <.link
+                navigate={~p"/dashboard"}
+                aria-current="page"
+                class={[
+                  "group flex items-center rounded-md px-2 py-2 text-sm font-medium",
+                  "bg-primary-800 text-white"
+                ]}
+              >
+                <.icon name="hero-home" class="mr-4 size-6 shrink-0 text-primary-200" /> Dashboard
+              </.link>
+            <% end %>
+          </div>
+        </nav>
+      </div>
+    </aside>
+    """
+  end
 end
