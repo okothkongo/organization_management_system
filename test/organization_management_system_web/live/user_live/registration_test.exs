@@ -57,16 +57,21 @@ defmodule OrganizationManagementSystemWeb.UserLive.RegistrationTest do
       %{conn: log_in_user(conn, super_user)}
     end
 
-    test "creates account but does not log in", %{conn: conn} do
+    test "creates account", %{conn: conn} do
+      role = Factory.insert!(:role)
+      permission = Factory.insert!(:permission)
+      Factory.insert!(:role_permission, role: role, permission: permission)
       {:ok, lv, _html} = live(conn, ~p"/users/register")
 
       email = unique_user_email()
-      form = form(lv, "#registration_form", user: valid_user_attributes(email: email))
+      attrs = valid_user_attributes(email: email)
+      valid_user_attributes = Map.put(attrs, :role_id, role.id)
+      form = form(lv, "#registration_form", user: valid_user_attributes)
 
       {:ok, _lv, html} =
         form
         |> render_submit()
-        |> follow_redirect(conn, ~p"/users/log-in")
+        |> follow_redirect(conn, ~p"/users")
 
       assert html =~
                ~r/An email was sent to .*, please notify the confirm their account/

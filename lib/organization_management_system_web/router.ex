@@ -65,6 +65,7 @@ defmodule OrganizationManagementSystemWeb.Router do
       live "/roles/new", RoleLive.Form, :new
       live "/roles/:id", RoleLive.Show, :show
       live "/users/register", UserLive.Registration, :new
+      live "/users", UserLive.Index, :index
     end
   end
 

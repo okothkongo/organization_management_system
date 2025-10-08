@@ -18,8 +18,8 @@ defmodule OrganizationManagementSystem.Accounts.UserPermission do
   @doc false
   def changeset(user_permission, attrs, scope) do
     user_permission
-    |> cast(attrs, [:granted_by, :user_id, :permission_id])
+    |> cast(attrs, [:user_id, :permission_id])
     |> validate_required([:user_id, :permission_id])
-    |> put_change(:granted_by_id, scope.account.id)
+    |> put_change(:granted_by_id, scope.user.id)
   end
 end
