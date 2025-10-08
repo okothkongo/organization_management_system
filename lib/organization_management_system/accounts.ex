@@ -87,6 +87,12 @@ defmodule OrganizationManagementSystem.Accounts do
     |> Repo.insert()
   end
 
+  def update_user(user, attrs) do
+    user
+    |> User.update_changeset(attrs)
+    |> Repo.update()
+  end
+
   ## Settings
 
   @doc """
