@@ -3,6 +3,7 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
 
   import Phoenix.LiveViewTest
   import OrganizationManagementSystem.AccountsFixtures
+  alias OrganizationManagementSystem.Factory
 
   @create_attrs %{
     name: "some name",
@@ -32,6 +33,7 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
     end
 
     test "saves new role", %{conn: conn} do
+      permission = Factory.insert!(:permission, action: "manage user")
       {:ok, index_live, _html} = live(conn, ~p"/roles")
 
       assert {:ok, form_live, _} =
@@ -48,9 +50,11 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
              |> form("#role-form", role: invalid_attrs)
              |> render_change() =~ "can&#39;t be blank"
 
+      attrs = Map.put(@create_attrs, :permission_id, permission.id)
+
       assert {:ok, index_live, _html} =
                form_live
-               |> form("#role-form", role: @create_attrs)
+               |> form("#role-form", role: attrs)
                |> render_submit()
                |> follow_redirect(conn, ~p"/roles")
 

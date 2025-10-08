@@ -4,10 +4,15 @@ defmodule OrganizationManagementSystem.Accounts do
   """
 
   import Ecto.Query, warn: false
+  alias OrganizationManagementSystem.Accounts.RolePermission
   alias OrganizationManagementSystem.Accounts.Abilities
   alias OrganizationManagementSystem.Repo
 
   alias OrganizationManagementSystem.Accounts.{User, UserToken, UserNotifier}
+
+  alias OrganizationManagementSystem.Accounts.Role
+  alias OrganizationManagementSystem.Accounts.Scope
+  alias OrganizationManagementSystem.Accounts.Permission
 
   ## Database getters
 
@@ -296,9 +301,6 @@ defmodule OrganizationManagementSystem.Accounts do
     end)
   end
 
-  alias OrganizationManagementSystem.Accounts.Role
-  alias OrganizationManagementSystem.Accounts.Scope
-
   @doc """
   Subscribes to scoped notifications about any role changes.
 
@@ -386,5 +388,25 @@ defmodule OrganizationManagementSystem.Accounts do
   """
   def change_role(%Scope{} = scope, %Role{} = role, attrs \\ %{}) do
     Role.changeset(role, attrs, scope)
+  end
+
+  @doc """
+  Returns the list of all permissions.
+
+  ## Examples
+
+      iex> list_permissions()
+      [%Permission{}, ...]
+
+  """
+  @spec list_permissions() :: [Permission.t()]
+  def list_permissions do
+    Repo.all(Permission)
+  end
+
+  def create_role_permission(attrs) do
+    %RolePermission{}
+    |> RolePermission.changeset(attrs)
+    |> Repo.insert()
   end
 end

@@ -7,6 +7,8 @@ defmodule OrganizationManagementSystem.Accounts.Permission do
   alias OrganizationManagementSystem.Accounts.Role
   alias OrganizationManagementSystem.Accounts.RolePermission
 
+  @type t :: %__MODULE__{}
+
   schema "permissions" do
     field :action, :string
     field :description, :string

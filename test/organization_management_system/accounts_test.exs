@@ -1,4 +1,5 @@
 defmodule OrganizationManagementSystem.AccountsTest do
+  alias OrganizationManagementSystem.Factory
   use OrganizationManagementSystem.DataCase
 
   alias OrganizationManagementSystem.Accounts
@@ -408,14 +409,17 @@ defmodule OrganizationManagementSystem.AccountsTest do
       scope = super_user_scope_fixture()
       role = role_fixture(scope)
 
-      assert Accounts.list_roles() == [role]
+      assert [listed_role] = Accounts.list_roles()
+      assert listed_role.name == role.name
     end
 
     test "get_role!/2 returns the role with given id" do
       scope = super_user_scope_fixture()
       role = role_fixture(scope)
 
-      assert Accounts.get_role!(role.id) == role
+      assert %Role{id: id, name: name} = Accounts.get_role!(role.id)
+      assert role.id == id
+      assert role.name == name
     end
 
     test "get_role!/2 throw error when given id has no existing role" do
@@ -423,11 +427,14 @@ defmodule OrganizationManagementSystem.AccountsTest do
     end
 
     test "create_role/2 with valid data creates a role" do
+      permission = Factory.insert!(:permission)
+
       valid_attrs = %{
         name: "some name",
         scope: :all,
         description: "some description",
-        system?: true
+        system?: true,
+        permission_id: permission.id
       }
 
       scope = super_user_scope_fixture()

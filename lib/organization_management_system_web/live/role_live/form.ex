@@ -19,7 +19,13 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
           field={@form[:scope]}
           type="select"
           label="Scope"
-          options={Ecto.Enum.values(Role, :scope) |> Enum.map(&{Phoenix.Naming.humanize(&1), &1})}
+          options={[{"Select Role Scope", ""}] ++ list_role_scope_options()}
+        />
+        <.input
+          field={@form[:permission_id]}
+          type="select"
+          label="Permission"
+          options={[{"Select Permision", ""}] ++ list_permission_options()}
         />
         <.input field={@form[:description]} type="text" label="Description" />
         <.input field={@form[:system?]} type="checkbox" label="System?" />
@@ -65,8 +71,12 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
   end
 
   defp save_role(socket, :new, role_params) do
+    permission_id = role_params["permission_id"]
+
     case Accounts.create_role(socket.assigns.current_scope, role_params) do
       {:ok, role} ->
+        Accounts.create_role_permission(%{role_id: role.id, permission_id: permission_id})
+
         {:noreply,
          socket
          |> put_flash(:info, "Role created successfully")
@@ -81,4 +91,12 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
 
   defp return_path(_scope, "index", _role), do: ~p"/roles"
   defp return_path(_scope, "show", role), do: ~p"/roles/#{role}"
+
+  defp list_permission_options do
+    Accounts.list_permissions() |> Enum.map(&{&1.action, &1.id})
+  end
+
+  defp list_role_scope_options do
+    Role |> Ecto.Enum.values(:scope) |> Enum.map(&{Phoenix.Naming.humanize(&1), &1})
+  end
 end

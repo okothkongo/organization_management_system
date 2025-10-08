@@ -6,6 +6,7 @@ defmodule OrganizationManagementSystem.AccountsFixtures do
 
   import Ecto.Query
 
+  alias OrganizationManagementSystem.Factory
   alias OrganizationManagementSystem.Accounts
   alias OrganizationManagementSystem.Accounts.Scope
 
@@ -97,12 +98,15 @@ defmodule OrganizationManagementSystem.AccountsFixtures do
   Generate a role.
   """
   def role_fixture(scope, attrs \\ %{}) do
+    permission = Factory.insert!(:permission)
+
     attrs =
       Enum.into(attrs, %{
         description: "some description",
         name: "some name",
         scope: :all,
-        system?: true
+        system?: true,
+        permission_id: permission.id
       })
 
     {:ok, role} = OrganizationManagementSystem.Accounts.create_role(scope, attrs)
