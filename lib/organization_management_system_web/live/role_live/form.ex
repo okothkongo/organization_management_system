@@ -43,8 +43,6 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
   defp return_to("show"), do: "show"
   defp return_to(_), do: "index"
 
-
-
   defp apply_action(socket, :new, _params) do
     role = %Role{created_by_id: socket.assigns.current_scope.user.id}
 

@@ -404,21 +404,22 @@ defmodule OrganizationManagementSystem.AccountsTest do
 
     @invalid_attrs %{name: nil, scope: nil, description: nil, system?: nil}
 
-    test "list_roles/1 returns all scoped roles" do
-      scope = user_scope_fixture()
-      other_scope = user_scope_fixture()
+    test "list_roles/0 returns all scoped roles" do
+      scope = super_user_scope_fixture()
       role = role_fixture(scope)
-      other_role = role_fixture(other_scope)
-      assert Accounts.list_roles(scope) == [role]
-      assert Accounts.list_roles(other_scope) == [other_role]
+
+      assert Accounts.list_roles() == [role]
     end
 
     test "get_role!/2 returns the role with given id" do
-      scope = user_scope_fixture()
+      scope = super_user_scope_fixture()
       role = role_fixture(scope)
-      other_scope = user_scope_fixture()
-      assert Accounts.get_role!(scope, role.id) == role
-      assert_raise Ecto.NoResultsError, fn -> Accounts.get_role!(other_scope, role.id) end
+
+      assert Accounts.get_role!(role.id) == role
+    end
+
+    test "get_role!/2 throw error when given id has no existing role" do
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_role!(1) end
     end
 
     test "create_role/2 with valid data creates a role" do
@@ -457,9 +458,8 @@ defmodule OrganizationManagementSystem.AccountsTest do
       assert {:error, %Ecto.Changeset{}} = Accounts.create_role(scope, @invalid_attrs)
     end
 
-
     test "change_role/2 returns a role changeset" do
-      scope = user_scope_fixture()
+      scope = super_user_scope_fixture()
       role = role_fixture(scope)
       assert %Ecto.Changeset{} = Accounts.change_role(scope, role)
     end

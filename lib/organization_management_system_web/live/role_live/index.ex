@@ -29,9 +29,7 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Index do
           <div class="sr-only">
             <.link navigate={~p"/roles/#{role}"}>Show</.link>
           </div>
-
         </:action>
-
       </.table>
     </Layouts.app>
     """
@@ -48,9 +46,6 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Index do
      |> assign(:page_title, "Listing Roles")
      |> stream(:roles, list_roles())}
   end
-
-
-
 
   defp list_roles do
     Accounts.list_roles()

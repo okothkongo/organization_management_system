@@ -14,7 +14,6 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Show do
           <.button navigate={~p"/roles"}>
             <.icon name="hero-arrow-left" />
           </.button>
-
         </:actions>
       </.header>
 
@@ -37,7 +36,7 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Show do
     {:ok,
      socket
      |> assign(:page_title, "Show Role")
-     |> assign(:role, Accounts.get_role!(socket.assigns.current_scope, id))}
+     |> assign(:role, Accounts.get_role!(id))}
   end
 
   @impl true
@@ -47,8 +46,6 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Show do
       ) do
     {:noreply, assign(socket, :role, role)}
   end
-
-
 
   def handle_info({type, %OrganizationManagementSystem.Accounts.Role{}}, socket)
       when type in [:created, :updated] do

@@ -326,7 +326,7 @@ defmodule OrganizationManagementSystem.Accounts do
 
   ## Examples
 
-      iex> list_roles(scope)
+      iex> list_roles()
       [%Role{}, ...]
 
   """
@@ -348,8 +348,8 @@ defmodule OrganizationManagementSystem.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_role!(%Scope{} = scope, id) do
-    Repo.get_by!(Role, id: id, user_id: scope.user.id)
+  def get_role!(id) do
+    Repo.get!(Role, id)
   end
 
   @doc """
@@ -374,7 +374,6 @@ defmodule OrganizationManagementSystem.Accounts do
       {:ok, role}
     end
   end
-
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking role changes.

@@ -65,13 +65,6 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
       assert html =~ "Show Role"
       assert html =~ role.name
     end
-
-    test "deletes role in listing", %{conn: conn, role: role} do
-      {:ok, index_live, _html} = live(conn, ~p"/roles")
-
-      assert index_live |> element("#roles-#{role.id} a", "Delete") |> render_click()
-      refute has_element?(index_live, "#roles-#{role.id}")
-    end
   end
 
   describe "non super user" do
