@@ -29,7 +29,7 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Index do
           <div class="sr-only">
             <.link navigate={~p"/roles/#{role}"}>Show</.link>
           </div>
-          <.link navigate={~p"/roles/#{role}/edit"}>Edit</.link>
+
         </:action>
         <:action :let={{id, role}}>
           <.link

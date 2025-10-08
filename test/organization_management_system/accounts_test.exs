@@ -457,41 +457,6 @@ defmodule OrganizationManagementSystem.AccountsTest do
       assert {:error, %Ecto.Changeset{}} = Accounts.create_role(scope, @invalid_attrs)
     end
 
-    test "update_role/3 with valid data updates the role" do
-      scope = user_scope_fixture()
-      role = role_fixture(scope)
-
-      update_attrs = %{
-        name: "some updated name",
-        scope: "some updated scope",
-        description: "some updated description",
-        system?: false
-      }
-
-      assert {:ok, %Role{} = role} = Accounts.update_role(scope, role, update_attrs)
-      assert role.name == "some updated name"
-      assert role.scope == "some updated scope"
-      assert role.description == "some updated description"
-      assert role.system? == false
-    end
-
-    test "update_role/3 with invalid scope raises" do
-      scope = user_scope_fixture()
-      other_scope = user_scope_fixture()
-      role = role_fixture(scope)
-
-      assert_raise MatchError, fn ->
-        Accounts.update_role(other_scope, role, %{})
-      end
-    end
-
-    test "update_role/3 with invalid data returns error changeset" do
-      scope = user_scope_fixture()
-      role = role_fixture(scope)
-      assert {:error, %Ecto.Changeset{}} = Accounts.update_role(scope, role, @invalid_attrs)
-      assert role == Accounts.get_role!(scope, role.id)
-    end
-
     test "delete_role/2 deletes the role" do
       scope = user_scope_fixture()
       role = role_fixture(scope)

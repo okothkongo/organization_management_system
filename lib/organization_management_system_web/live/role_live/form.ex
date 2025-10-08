@@ -43,14 +43,7 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
   defp return_to("show"), do: "show"
   defp return_to(_), do: "index"
 
-  defp apply_action(socket, :edit, %{"id" => id}) do
-    role = Accounts.get_role!(socket.assigns.current_scope, id)
 
-    socket
-    |> assign(:page_title, "Edit Role")
-    |> assign(:role, role)
-    |> assign(:form, to_form(Accounts.change_role(socket.assigns.current_scope, role)))
-  end
 
   defp apply_action(socket, :new, _params) do
     role = %Role{created_by_id: socket.assigns.current_scope.user.id}
@@ -71,21 +64,6 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
 
   def handle_event("save", %{"role" => role_params}, socket) do
     save_role(socket, socket.assigns.live_action, role_params)
-  end
-
-  defp save_role(socket, :edit, role_params) do
-    case Accounts.update_role(socket.assigns.current_scope, socket.assigns.role, role_params) do
-      {:ok, role} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Role updated successfully")
-         |> push_navigate(
-           to: return_path(socket.assigns.current_scope, socket.assigns.return_to, role)
-         )}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, form: to_form(changeset))}
-    end
   end
 
   defp save_role(socket, :new, role_params) do

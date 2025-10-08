@@ -376,30 +376,6 @@ defmodule OrganizationManagementSystem.Accounts do
   end
 
   @doc """
-  Updates a role.
-
-  ## Examples
-
-      iex> update_role(scope, role, %{field: new_value})
-      {:ok, %Role{}}
-
-      iex> update_role(scope, role, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_role(%Scope{} = scope, %Role{} = role, attrs) do
-    true = role.user_id == scope.user.id
-
-    with {:ok, role = %Role{}} <-
-           role
-           |> Role.changeset(attrs, scope)
-           |> Repo.update() do
-      broadcast_role(scope, {:updated, role})
-      {:ok, role}
-    end
-  end
-
-  @doc """
   Deletes a role.
 
   ## Examples

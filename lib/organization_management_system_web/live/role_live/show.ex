@@ -14,9 +14,7 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Show do
           <.button navigate={~p"/roles"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/roles/#{@role}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit role
-          </.button>
+
         </:actions>
       </.header>
 

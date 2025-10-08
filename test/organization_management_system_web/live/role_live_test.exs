@@ -6,26 +6,22 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
 
   @create_attrs %{
     name: "some name",
-    scope: :all,
+    scope: "all",
     description: "some description",
     system?: true
   }
-  @update_attrs %{
-    name: "some updated name",
-    description: "some updated description",
-    system?: false
-  }
+
   @invalid_attrs %{name: nil, scope: nil, description: nil, system?: false}
 
-  setup :register_and_log_in_super_user
+  describe "super user" do
+    setup :register_and_log_in_super_user
 
-  defp create_role(%{scope: scope}) do
-    role = role_fixture(scope)
+    defp create_role(%{scope: scope}) do
+      role = role_fixture(scope)
 
-    %{role: role}
-  end
+      %{role: role}
+    end
 
-  describe "Index" do
     setup [:create_role]
 
     test "lists all roles", %{conn: conn, role: role} do
@@ -46,8 +42,10 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
 
       assert render(form_live) =~ "New Role"
 
+      invalid_attrs = Map.put(@invalid_attrs, :scope, "all")
+
       assert form_live
-             |> form("#role-form", role: @invalid_attrs)
+             |> form("#role-form", role: invalid_attrs)
              |> render_change() =~ "can&#39;t be blank"
 
       assert {:ok, index_live, _html} =
@@ -61,30 +59,11 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
       assert html =~ "some name"
     end
 
-    test "updates role in listing", %{conn: conn, role: role} do
-      {:ok, index_live, _html} = live(conn, ~p"/roles")
+    test "displays role", %{conn: conn, role: role} do
+      {:ok, _show_live, html} = live(conn, ~p"/roles/#{role}")
 
-      assert {:ok, form_live, _html} =
-               index_live
-               |> element("#roles-#{role.id} a", "Edit")
-               |> render_click()
-               |> follow_redirect(conn, ~p"/roles/#{role}/edit")
-
-      assert render(form_live) =~ "Edit Role"
-
-      assert form_live
-             |> form("#role-form", role: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
-
-      assert {:ok, index_live, _html} =
-               form_live
-               |> form("#role-form", role: @update_attrs)
-               |> render_submit()
-               |> follow_redirect(conn, ~p"/roles")
-
-      html = render(index_live)
-      assert html =~ "Role updated successfully"
-      assert html =~ "some updated name"
+      assert html =~ "Show Role"
+      assert html =~ role.name
     end
 
     test "deletes role in listing", %{conn: conn, role: role} do
@@ -95,40 +74,14 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
     end
   end
 
-  describe "Show" do
-    setup [:create_role]
+  describe "non super user" do
+    setup :register_and_log_in_user
 
-    test "displays role", %{conn: conn, role: role} do
-      {:ok, _show_live, html} = live(conn, ~p"/roles/#{role}")
-
-      assert html =~ "Show Role"
-      assert html =~ role.name
-    end
-
-    test "updates role and returns to show", %{conn: conn, role: role} do
-      {:ok, show_live, _html} = live(conn, ~p"/roles/#{role}")
-
-      assert {:ok, form_live, _} =
-               show_live
-               |> element("a", "Edit")
-               |> render_click()
-               |> follow_redirect(conn, ~p"/roles/#{role}/edit?return_to=show")
-
-      assert render(form_live) =~ "Edit Role"
-
-      assert form_live
-             |> form("#role-form", role: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
-
-      assert {:ok, show_live, _html} =
-               form_live
-               |> form("#role-form", role: @update_attrs)
-               |> render_submit()
-               |> follow_redirect(conn, ~p"/roles/#{role}")
-
-      html = render(show_live)
-      assert html =~ "Role updated successfully"
-      assert html =~ "some updated name"
+    test "cannot access index page", %{conn: conn} do
+      assert {:error,
+              {:redirect,
+               %{to: "/", flash: %{"error" => "You are not authorized to access this page."}}}} =
+               live(conn, ~p"/roles")
     end
   end
 end
