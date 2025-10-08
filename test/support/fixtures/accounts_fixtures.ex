@@ -6,6 +6,7 @@ defmodule OrganizationManagementSystem.AccountsFixtures do
 
   import Ecto.Query
 
+  alias OrganizationManagementSystem.Factory
   alias OrganizationManagementSystem.Accounts
   alias OrganizationManagementSystem.Accounts.Scope
 
@@ -44,6 +45,11 @@ defmodule OrganizationManagementSystem.AccountsFixtures do
 
   def user_scope_fixture do
     user = user_fixture()
+    user_scope_fixture(user)
+  end
+
+  def super_user_scope_fixture do
+    user = user_fixture(is_super_user?: true)
     user_scope_fixture(user)
   end
 
@@ -86,5 +92,24 @@ defmodule OrganizationManagementSystem.AccountsFixtures do
       from(ut in Accounts.UserToken, where: ut.token == ^token),
       set: [inserted_at: dt, authenticated_at: dt]
     )
+  end
+
+  @doc """
+  Generate a role.
+  """
+  def role_fixture(scope, attrs \\ %{}) do
+    permission = Factory.insert!(:permission)
+
+    attrs =
+      Enum.into(attrs, %{
+        description: "some description",
+        name: "some name",
+        scope: :all,
+        system?: true,
+        permission_id: permission.id
+      })
+
+    {:ok, role} = OrganizationManagementSystem.Accounts.create_role(scope, attrs)
+    role
   end
 end

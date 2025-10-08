@@ -1,4 +1,5 @@
 defmodule OrganizationManagementSystem.AccountsTest do
+  alias OrganizationManagementSystem.Factory
   use OrganizationManagementSystem.DataCase
 
   alias OrganizationManagementSystem.Accounts
@@ -393,6 +394,81 @@ defmodule OrganizationManagementSystem.AccountsTest do
   describe "inspect/2 for the User module" do
     test "does not include password" do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
+    end
+  end
+
+  describe "roles" do
+    alias OrganizationManagementSystem.Accounts.Role
+
+    import OrganizationManagementSystem.AccountsFixtures, only: [user_scope_fixture: 0]
+    import OrganizationManagementSystem.AccountsFixtures
+
+    @invalid_attrs %{name: nil, scope: nil, description: nil, system?: nil}
+
+    test "list_roles/0 returns all scoped roles" do
+      scope = super_user_scope_fixture()
+      role = role_fixture(scope)
+
+      assert [listed_role] = Accounts.list_roles()
+      assert listed_role.name == role.name
+    end
+
+    test "get_role!/2 returns the role with given id" do
+      scope = super_user_scope_fixture()
+      role = role_fixture(scope)
+
+      assert %Role{id: id, name: name} = Accounts.get_role!(role.id)
+      assert role.id == id
+      assert role.name == name
+    end
+
+    test "get_role!/2 throw error when given id has no existing role" do
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_role!(1) end
+    end
+
+    test "create_role/2 with valid data creates a role" do
+      permission = Factory.insert!(:permission)
+
+      valid_attrs = %{
+        name: "some name",
+        scope: :all,
+        description: "some description",
+        system?: true,
+        permission_id: permission.id
+      }
+
+      scope = super_user_scope_fixture()
+
+      assert {:ok, %Role{} = role} = Accounts.create_role(scope, valid_attrs)
+      assert role.name == "some name"
+      assert role.scope == :all
+      assert role.description == "some description"
+      assert role.system? == true
+      assert role.created_by_id == scope.user.id
+    end
+
+    test "create_role/2 non superuser cannot create role" do
+      valid_attrs = %{
+        name: "some name",
+        scope: :all,
+        description: "some description",
+        system?: true
+      }
+
+      scope = user_scope_fixture()
+
+      refute Accounts.create_role(scope, valid_attrs)
+    end
+
+    test "create_role/2 with invalid data returns error changeset" do
+      scope = super_user_scope_fixture()
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_role(scope, @invalid_attrs)
+    end
+
+    test "change_role/2 returns a role changeset" do
+      scope = super_user_scope_fixture()
+      role = role_fixture(scope)
+      assert %Ecto.Changeset{} = Accounts.change_role(scope, role)
     end
   end
 end

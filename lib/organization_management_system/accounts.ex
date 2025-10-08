@@ -4,9 +4,15 @@ defmodule OrganizationManagementSystem.Accounts do
   """
 
   import Ecto.Query, warn: false
+  alias OrganizationManagementSystem.Accounts.RolePermission
+  alias OrganizationManagementSystem.Accounts.Abilities
   alias OrganizationManagementSystem.Repo
 
   alias OrganizationManagementSystem.Accounts.{User, UserToken, UserNotifier}
+
+  alias OrganizationManagementSystem.Accounts.Role
+  alias OrganizationManagementSystem.Accounts.Scope
+  alias OrganizationManagementSystem.Accounts.Permission
 
   ## Database getters
 
@@ -293,5 +299,114 @@ defmodule OrganizationManagementSystem.Accounts do
         {:ok, {user, tokens_to_expire}}
       end
     end)
+  end
+
+  @doc """
+  Subscribes to scoped notifications about any role changes.
+
+  The broadcasted messages match the pattern:
+
+    * {:created, %Role{}}
+    * {:updated, %Role{}}
+    * {:deleted, %Role{}}
+
+  """
+  def subscribe_roles(%Scope{} = scope) do
+    key = scope.user.id
+
+    Phoenix.PubSub.subscribe(OrganizationManagementSystem.PubSub, "user:#{key}:roles")
+  end
+
+  defp broadcast_role(%Scope{} = scope, message) do
+    key = scope.user.id
+
+    Phoenix.PubSub.broadcast(OrganizationManagementSystem.PubSub, "user:#{key}:roles", message)
+  end
+
+  @doc """
+  Returns the list of roles.
+
+  ## Examples
+
+      iex> list_roles()
+      [%Role{}, ...]
+
+  """
+  def list_roles do
+    Repo.all(Role)
+  end
+
+  @doc """
+  Gets a single role.
+
+  Raises `Ecto.NoResultsError` if the Role does not exist.
+
+  ## Examples
+
+      iex> get_role!(scope, 123)
+      %Role{}
+
+      iex> get_role!(scope, 456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_role!(id) do
+    Repo.get!(Role, id)
+  end
+
+  @doc """
+  Creates a role.
+
+  ## Examples
+
+      iex> create_role(scope, %{field: value})
+      {:ok, %Role{}}
+
+      iex> create_role(scope, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_role(%Scope{} = scope, attrs) do
+    with true <- Abilities.can_create_role?(scope.user),
+         {:ok, %Role{} = role} <-
+           %Role{}
+           |> Role.changeset(attrs, scope)
+           |> Repo.insert() do
+      broadcast_role(scope, {:created, role})
+      {:ok, role}
+    end
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking role changes.
+
+  ## Examples
+
+      iex> change_role(scope, role)
+      %Ecto.Changeset{data: %Role{}}
+
+  """
+  def change_role(%Scope{} = scope, %Role{} = role, attrs \\ %{}) do
+    Role.changeset(role, attrs, scope)
+  end
+
+  @doc """
+  Returns the list of all permissions.
+
+  ## Examples
+
+      iex> list_permissions()
+      [%Permission{}, ...]
+
+  """
+  @spec list_permissions() :: [Permission.t()]
+  def list_permissions do
+    Repo.all(Permission)
+  end
+
+  def create_role_permission(attrs) do
+    %RolePermission{}
+    |> RolePermission.changeset(attrs)
+    |> Repo.insert()
   end
 end

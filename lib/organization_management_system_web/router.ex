@@ -54,9 +54,17 @@ defmodule OrganizationManagementSystemWeb.Router do
       on_mount: [{OrganizationManagementSystemWeb.UserAuth, :require_authenticated}] do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
+      get "/dashboard", PageController, :dashboard
     end
 
     post "/users/update-password", UserSessionController, :update_password
+
+    live_session :require_authenticated_super_user,
+      on_mount: [{OrganizationManagementSystemWeb.UserAuth, :require_authenticated_super_user}] do
+      live "/roles", RoleLive.Index, :index
+      live "/roles/new", RoleLive.Form, :new
+      live "/roles/:id", RoleLive.Show, :show
+    end
   end
 
   scope "/", OrganizationManagementSystemWeb do
