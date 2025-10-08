@@ -2,10 +2,14 @@ defmodule OrganizationManagementSystemWeb.UserSessionControllerTest do
   use OrganizationManagementSystemWeb.ConnCase, async: true
 
   import OrganizationManagementSystem.AccountsFixtures
+  alias OrganizationManagementSystem.Factory
   alias OrganizationManagementSystem.Accounts
 
   setup do
-    %{unconfirmed_user: unconfirmed_user_fixture(), user: user_fixture()}
+    %{
+      unconfirmed_user: unconfirmed_user_fixture(status: :approved),
+      user: Factory.insert!(:approved_user)
+    }
   end
 
   describe "POST /users/log-in - email and password" do

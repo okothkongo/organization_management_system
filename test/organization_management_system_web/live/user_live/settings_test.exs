@@ -1,9 +1,11 @@
 defmodule OrganizationManagementSystemWeb.UserLive.SettingsTest do
   use OrganizationManagementSystemWeb.ConnCase, async: true
 
-  alias OrganizationManagementSystem.Accounts
   import Phoenix.LiveViewTest
   import OrganizationManagementSystem.AccountsFixtures
+
+  alias OrganizationManagementSystem.Factory
+  alias OrganizationManagementSystem.Accounts
 
   describe "Settings page" do
     test "renders settings page", %{conn: conn} do
@@ -39,7 +41,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.SettingsTest do
 
   describe "update email form" do
     setup %{conn: conn} do
-      user = user_fixture()
+      user = Factory.insert!(:approved_user)
       %{conn: log_in_user(conn, user), user: user}
     end
 
@@ -91,7 +93,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.SettingsTest do
 
   describe "update password form" do
     setup %{conn: conn} do
-      user = user_fixture()
+      user = Factory.insert!(:approved_user)
       %{conn: log_in_user(conn, user), user: user}
     end
 

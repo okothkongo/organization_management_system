@@ -3,6 +3,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.LoginTest do
 
   import Phoenix.LiveViewTest
   import OrganizationManagementSystem.AccountsFixtures
+  alias OrganizationManagementSystem.Factory
 
   describe "login page" do
     test "renders login page", %{conn: conn} do
@@ -50,7 +51,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.LoginTest do
 
   describe "user login - password" do
     test "redirects if user logs in with valid credentials", %{conn: conn} do
-      user = user_fixture() |> set_password()
+      user = Factory.insert!(:approved_user) |> set_password()
 
       {:ok, lv, _html} = live(conn, ~p"/users/log-in")
 

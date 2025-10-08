@@ -45,6 +45,15 @@ defmodule OrganizationManagementSystem.Factory do
     }
   end
 
+  def build(:approved_user) do
+    %User{
+      email: "user#{System.unique_integer()}@example.com",
+      name: "John Doe",
+      status: :approved,
+      confirmed_at: DateTime.utc_now(:second)
+    }
+  end
+
   def build(:role) do
     %Role{
       name: "user_reviewer",
