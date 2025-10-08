@@ -11,14 +11,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.Registration do
       <div class="mx-auto max-w-sm">
         <div class="text-center">
           <.header>
-            Register for an account
-            <:subtitle>
-              Already registered?
-              <.link navigate={~p"/users/log-in"} class="font-semibold text-brand hover:underline">
-                Log in
-              </.link>
-              to your account now.
-            </:subtitle>
+           Invite User
           </.header>
         </div>
 
@@ -49,10 +42,10 @@ defmodule OrganizationManagementSystemWeb.UserLive.Registration do
   end
 
   @impl true
-  def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket)
-      when not is_nil(user) do
-    {:ok, redirect(socket, to: OrganizationManagementSystemWeb.UserAuth.signed_in_path(socket))}
-  end
+  # def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket)
+  #     when not is_nil(user) do
+  #   {:ok, redirect(socket, to: OrganizationManagementSystemWeb.UserAuth.signed_in_path(socket))}
+  # end
 
   def mount(_params, _session, socket) do
     changeset = Accounts.change_user_email(%User{}, %{}, validate_unique: false)
@@ -74,7 +67,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.Registration do
          socket
          |> put_flash(
            :info,
-           "An email was sent to #{user.email}, please access it to confirm your account."
+           "An email was sent to #{user.email}, please notify the confirm their account."
          )
          |> push_navigate(to: ~p"/users/log-in")}
 
