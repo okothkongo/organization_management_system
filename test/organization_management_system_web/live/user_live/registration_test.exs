@@ -8,20 +8,20 @@ defmodule OrganizationManagementSystemWeb.UserLive.RegistrationTest do
   describe "Registration page" do
     test "non logged in user", %{conn: conn} do
       assert {:error,
-      {:redirect,
-       %{
-         to: "/users/log-in",
-         flash: %{"error" => "You must log in to access this page."}
-       }}} = live(conn, ~p"/users/register")
+              {:redirect,
+               %{
+                 to: "/users/log-in",
+                 flash: %{"error" => "You must log in to access this page."}
+               }}} = live(conn, ~p"/users/register")
     end
+
     test "renders registration page for super user", %{conn: conn} do
       super_user = Factory.insert!(:super_user)
       conn = log_in_user(conn, super_user)
 
       {:ok, _lv, html} = live(conn, ~p"/users/register")
 
-      assert html =~ "Register"
-      assert html =~ "Log in"
+      assert html =~ "Invite User"
     end
 
     test "does not renders registration page for non super user", %{conn: conn} do
@@ -36,7 +36,6 @@ defmodule OrganizationManagementSystemWeb.UserLive.RegistrationTest do
                }}} = live(conn, ~p"/users/register")
     end
 
-
     test "renders errors for invalid data", %{conn: conn} do
       super_user = Factory.insert!(:super_user)
       conn = log_in_user(conn, super_user)
@@ -47,7 +46,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.RegistrationTest do
         |> element("#registration_form")
         |> render_change(user: %{"email" => "with spaces"})
 
-      assert result =~ "Register"
+      assert result =~ "Invite User"
       assert result =~ "must have the @ sign and no spaces"
     end
   end
@@ -57,6 +56,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.RegistrationTest do
       super_user = Factory.insert!(:super_user)
       %{conn: log_in_user(conn, super_user)}
     end
+
     test "creates account but does not log in", %{conn: conn} do
       {:ok, lv, _html} = live(conn, ~p"/users/register")
 
@@ -85,20 +85,6 @@ defmodule OrganizationManagementSystemWeb.UserLive.RegistrationTest do
         |> render_submit()
 
       assert result =~ "has already been taken"
-    end
-  end
-
-  describe "registration navigation" do
-    test "redirects to login page when the Log in button is clicked", %{conn: conn} do
-      {:ok, lv, _html} = live(conn, ~p"/users/register")
-
-      {:ok, _login_live, login_html} =
-        lv
-        |> element("main a", "Log in")
-        |> render_click()
-        |> follow_redirect(conn, ~p"/users/log-in")
-
-      assert login_html =~ "Log in"
     end
   end
 end

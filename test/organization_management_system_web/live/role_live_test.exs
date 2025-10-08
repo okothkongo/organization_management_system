@@ -77,7 +77,10 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
     test "cannot access index page", %{conn: conn} do
       assert {:error,
               {:redirect,
-               %{to: "/dashboard", flash: %{"error" => "You are not authorized to access this page."}}}} =
+               %{
+                 to: "/dashboard",
+                 flash: %{"error" => "You are not authorized to access this page."}
+               }}} =
                live(conn, ~p"/roles")
     end
   end
