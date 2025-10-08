@@ -3,26 +3,43 @@ defmodule OrganizationManagementSystemWeb.UserLive.RegistrationTest do
 
   import Phoenix.LiveViewTest
   import OrganizationManagementSystem.AccountsFixtures
+  alias OrganizationManagementSystem.Factory
 
   describe "Registration page" do
-    test "renders registration page", %{conn: conn} do
+    test "non logged in user", %{conn: conn} do
+      assert {:error,
+      {:redirect,
+       %{
+         to: "/users/log-in",
+         flash: %{"error" => "You must log in to access this page."}
+       }}} = live(conn, ~p"/users/register")
+    end
+    test "renders registration page for super user", %{conn: conn} do
+      super_user = Factory.insert!(:super_user)
+      conn = log_in_user(conn, super_user)
+
       {:ok, _lv, html} = live(conn, ~p"/users/register")
 
       assert html =~ "Register"
       assert html =~ "Log in"
     end
 
-    test "redirects if already logged in", %{conn: conn} do
-      result =
-        conn
-        |> log_in_user(user_fixture())
-        |> live(~p"/users/register")
-        |> follow_redirect(conn, ~p"/dashboard")
+    test "does not renders registration page for non super user", %{conn: conn} do
+      user = Factory.insert!(:user)
+      conn = log_in_user(conn, user)
 
-      assert {:ok, _conn} = result
+      assert {:error,
+              {:redirect,
+               %{
+                 to: "/dashboard",
+                 flash: %{"error" => "You are not authorized to access this page."}
+               }}} = live(conn, ~p"/users/register")
     end
 
+
     test "renders errors for invalid data", %{conn: conn} do
+      super_user = Factory.insert!(:super_user)
+      conn = log_in_user(conn, super_user)
       {:ok, lv, _html} = live(conn, ~p"/users/register")
 
       result =
@@ -36,6 +53,10 @@ defmodule OrganizationManagementSystemWeb.UserLive.RegistrationTest do
   end
 
   describe "register user" do
+    setup %{conn: conn} do
+      super_user = Factory.insert!(:super_user)
+      %{conn: log_in_user(conn, super_user)}
+    end
     test "creates account but does not log in", %{conn: conn} do
       {:ok, lv, _html} = live(conn, ~p"/users/register")
 
@@ -48,7 +69,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.RegistrationTest do
         |> follow_redirect(conn, ~p"/users/log-in")
 
       assert html =~
-               ~r/An email was sent to .*, please access it to confirm your account/
+               ~r/An email was sent to .*, please notify the confirm their account/
     end
 
     test "renders errors for duplicated email", %{conn: conn} do

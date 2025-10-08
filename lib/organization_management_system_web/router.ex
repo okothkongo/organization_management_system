@@ -64,6 +64,7 @@ defmodule OrganizationManagementSystemWeb.Router do
       live "/roles", RoleLive.Index, :index
       live "/roles/new", RoleLive.Form, :new
       live "/roles/:id", RoleLive.Show, :show
+      live "/users/register", UserLive.Registration, :new
     end
   end
 
@@ -72,7 +73,6 @@ defmodule OrganizationManagementSystemWeb.Router do
 
     live_session :current_user,
       on_mount: [{OrganizationManagementSystemWeb.UserAuth, :mount_current_scope}] do
-      live "/users/register", UserLive.Registration, :new
       live "/users/log-in", UserLive.Login, :new
       live "/users/log-in/:token", UserLive.Confirmation, :new
     end

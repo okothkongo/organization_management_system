@@ -262,7 +262,7 @@ defmodule OrganizationManagementSystemWeb.UserAuth do
       !current_user.is_super_user? ->
         socket
         |> Phoenix.LiveView.put_flash(:error, "You are not authorized to access this page.")
-        |> Phoenix.LiveView.redirect(to: ~p"/")
+        |> Phoenix.LiveView.redirect(to: ~p"/dashboard")
         |> then(&{:halt, &1})
 
       true ->

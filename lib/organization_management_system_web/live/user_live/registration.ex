@@ -49,10 +49,10 @@ defmodule OrganizationManagementSystemWeb.UserLive.Registration do
   end
 
   @impl true
-  def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket)
-      when not is_nil(user) do
-    {:ok, redirect(socket, to: OrganizationManagementSystemWeb.UserAuth.signed_in_path(socket))}
-  end
+  # def mount(_params, _session, %{assigns: %{current_scope: %{user: user}}} = socket)
+  #     when not is_nil(user) do
+  #   {:ok, redirect(socket, to: OrganizationManagementSystemWeb.UserAuth.signed_in_path(socket))}
+  # end
 
   def mount(_params, _session, socket) do
     changeset = Accounts.change_user_email(%User{}, %{}, validate_unique: false)
