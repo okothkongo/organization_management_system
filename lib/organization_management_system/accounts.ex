@@ -4,6 +4,7 @@ defmodule OrganizationManagementSystem.Accounts do
   """
 
   import Ecto.Query, warn: false
+  alias OrganizationManagementSystem.Accounts.UserPermission
   alias OrganizationManagementSystem.Accounts.RolePermission
   alias OrganizationManagementSystem.Accounts.Abilities
   alias OrganizationManagementSystem.Repo
@@ -84,6 +85,12 @@ defmodule OrganizationManagementSystem.Accounts do
     %User{}
     |> User.email_changeset(attrs)
     |> Repo.insert()
+  end
+
+  def update_user(user, attrs) do
+    user
+    |> User.update_changeset(attrs)
+    |> Repo.update()
   end
 
   ## Settings
@@ -408,5 +415,40 @@ defmodule OrganizationManagementSystem.Accounts do
     %RolePermission{}
     |> RolePermission.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def list_users do
+    Repo.all(User)
+  end
+
+  def get_permission_by_action!(action) do
+    Repo.get_by!(Permission, action: action)
+  end
+
+  def create_user_permission(attrs, scope) do
+    %UserPermission{}
+    |> UserPermission.changeset(attrs, scope)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Returns the list of permissions for a given role_id.
+
+  ## Examples
+
+      iex> get_permissions_by_role_id(role_id)
+      [%Permission{}, ...]
+
+  """
+  @spec get_permissions_by_role_id(integer()) :: [Permission.t()]
+  def get_permissions_by_role_id(role_id) do
+    query =
+      from p in Permission,
+        join: rp in RolePermission,
+        on: rp.permission_id == p.id,
+        where: rp.role_id == ^role_id,
+        select: p
+
+    Repo.one(query)
   end
 end

@@ -18,7 +18,9 @@ defmodule OrganizationManagementSystem.Factory do
 
   """
   alias OrganizationManagementSystem.Accounts.Permission
+  alias OrganizationManagementSystem.Accounts.RolePermission
   alias OrganizationManagementSystem.Accounts.User
+  alias OrganizationManagementSystem.Accounts.Role
   alias OrganizationManagementSystem.Repo
 
   def build(:permission) do
@@ -40,6 +42,22 @@ defmodule OrganizationManagementSystem.Factory do
     %User{
       email: "user#{System.unique_integer()}@example.com",
       name: "John Doe"
+    }
+  end
+
+  def build(:role) do
+    %Role{
+      name: "user_reviewer",
+      created_by: build(:super_user),
+      description: "some role",
+      scope: :all
+    }
+  end
+
+  def build(:role_permission) do
+    %RolePermission{
+      role: build(:role),
+      permission: build(:permission)
     }
   end
 

@@ -11,7 +11,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.Registration do
       <div class="mx-auto max-w-sm">
         <div class="text-center">
           <.header>
-           Invite User
+            Invite User
           </.header>
         </div>
 
@@ -30,6 +30,12 @@ defmodule OrganizationManagementSystemWeb.UserLive.Registration do
             label="Email"
             autocomplete="useremail"
             required
+          />
+          <.input
+            field={@form[:role_id]}
+            type="select"
+            label="Role"
+            options={[{"Select Role", ""}] ++ list_role_options()}
           />
 
           <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
@@ -57,6 +63,15 @@ defmodule OrganizationManagementSystemWeb.UserLive.Registration do
   def handle_event("save", %{"user" => user_params}, socket) do
     case Accounts.register_user(user_params) do
       {:ok, user} ->
+        role_id = user_params["role_id"]
+        permission = Accounts.get_permissions_by_role_id(role_id)
+
+        {:ok, _} =
+          Accounts.create_user_permission(
+            %{user_id: user.id, permission_id: permission.id},
+            socket.assigns.current_scope
+          )
+
         {:ok, _} =
           Accounts.deliver_login_instructions(
             user,
@@ -69,7 +84,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.Registration do
            :info,
            "An email was sent to #{user.email}, please notify the confirm their account."
          )
-         |> push_navigate(to: ~p"/users/log-in")}
+         |> push_navigate(to: ~p"/users")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
@@ -84,5 +99,9 @@ defmodule OrganizationManagementSystemWeb.UserLive.Registration do
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     form = to_form(changeset, as: "user")
     assign(socket, form: form)
+  end
+
+  defp list_role_options do
+    Accounts.list_roles() |> Enum.map(&{&1.name, &1.id})
   end
 end

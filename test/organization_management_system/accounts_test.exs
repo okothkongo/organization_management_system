@@ -423,7 +423,7 @@ defmodule OrganizationManagementSystem.AccountsTest do
     end
 
     test "get_role!/2 throw error when given id has no existing role" do
-      assert_raise Ecto.NoResultsError, fn -> Accounts.get_role!(1) end
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_role!(-1) end
     end
 
     test "create_role/2 with valid data creates a role" do
@@ -469,6 +469,43 @@ defmodule OrganizationManagementSystem.AccountsTest do
       scope = super_user_scope_fixture()
       role = role_fixture(scope)
       assert %Ecto.Changeset{} = Accounts.change_role(scope, role)
+    end
+  end
+
+  describe "permissions" do
+    setup do
+      %{permission: Factory.insert!(:permission)}
+    end
+
+    test "list_permissions/0 returns all permissions", %{permission: permission} do
+      permissions = Accounts.list_permissions()
+      assert permission in permissions
+    end
+
+    test "get_permission_by_action!/1 fetches permission with existing action", %{
+      permission: permission
+    } do
+      fetched_permission = Accounts.get_permission_by_action!(permission.action)
+      assert fetched_permission == permission
+    end
+
+    test "get_permission_by_action!/1 throws error action does not exist" do
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_permission_by_action!("noexisting") end
+    end
+  end
+
+  test "list_user/0" do
+    user = Factory.insert!(:user)
+    users = Accounts.list_users()
+    assert user in users
+  end
+
+  describe "user_permission" do
+    test "create_user_permission/2 with valid attrs" do
+      scope = super_user_scope_fixture()
+      user = Factory.insert!(:user)
+      permission = Factory.insert!(:permission)
+      Accounts.create_user_permission(%{user_id: user.id, permission_id: permission.id}, scope)
     end
   end
 end
