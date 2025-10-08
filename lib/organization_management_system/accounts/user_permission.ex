@@ -5,8 +5,6 @@ defmodule OrganizationManagementSystem.Accounts.UserPermission do
   alias OrganizationManagementSystem.Accounts.User
 
   schema "user_permissions" do
-
-
     belongs_to :user, User
     belongs_to :permission, Permission
     belongs_to :granted_by, User, foreign_key: :granted_by_id
@@ -17,7 +15,7 @@ defmodule OrganizationManagementSystem.Accounts.UserPermission do
   @doc false
   def changeset(user_permission, attrs, scope) do
     user_permission
-    |> cast(attrs, [:granted_by,:user_id, :permission_id])
+    |> cast(attrs, [:granted_by, :user_id, :permission_id])
     |> validate_required([:user_id, :permission_id])
     |> put_change(:granted_by_id, scope.account.id)
   end

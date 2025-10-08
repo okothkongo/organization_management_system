@@ -4,6 +4,7 @@ defmodule OrganizationManagementSystem.Accounts do
   """
 
   import Ecto.Query, warn: false
+  alias OrganizationManagementSystem.Accounts.Abilities
   alias OrganizationManagementSystem.Repo
 
   alias OrganizationManagementSystem.Accounts.{User, UserToken, UserNotifier}
@@ -329,8 +330,8 @@ defmodule OrganizationManagementSystem.Accounts do
       [%Role{}, ...]
 
   """
-  def list_roles(%Scope{} = scope) do
-    Repo.all_by(Role, user_id: scope.user.id)
+  def list_roles() do
+    Repo.all(Role)
   end
 
   @doc """
@@ -364,7 +365,8 @@ defmodule OrganizationManagementSystem.Accounts do
 
   """
   def create_role(%Scope{} = scope, attrs) do
-    with {:ok, role = %Role{}} <-
+    with true <- Abilities.can_create_role?(scope.user),
+         {:ok, %Role{} = role} <-
            %Role{}
            |> Role.changeset(attrs, scope)
            |> Repo.insert() do
@@ -429,8 +431,6 @@ defmodule OrganizationManagementSystem.Accounts do
 
   """
   def change_role(%Scope{} = scope, %Role{} = role, attrs \\ %{}) do
-    true = role.user_id == scope.user.id
-
     Role.changeset(role, attrs, scope)
   end
 end

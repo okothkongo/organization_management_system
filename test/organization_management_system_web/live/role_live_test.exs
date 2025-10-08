@@ -4,11 +4,20 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
   import Phoenix.LiveViewTest
   import OrganizationManagementSystem.AccountsFixtures
 
-  @create_attrs %{name: "some name", scope: "some scope", description: "some description", system?: true}
-  @update_attrs %{name: "some updated name", scope: "some updated scope", description: "some updated description", system?: false}
+  @create_attrs %{
+    name: "some name",
+    scope: :all,
+    description: "some description",
+    system?: true
+  }
+  @update_attrs %{
+    name: "some updated name",
+    description: "some updated description",
+    system?: false
+  }
   @invalid_attrs %{name: nil, scope: nil, description: nil, system?: false}
 
-  setup :register_and_log_in_user
+  setup :register_and_log_in_super_user
 
   defp create_role(%{scope: scope}) do
     role = role_fixture(scope)

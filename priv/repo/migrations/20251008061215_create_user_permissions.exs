@@ -13,7 +13,6 @@ defmodule OrganizationManagementSystem.Repo.Migrations.CreateUserPermissions do
 
     create index(:user_permissions, [:user_id])
 
-
     create index(:user_permissions, [:permission_id])
     create index(:user_permissions, [:granted_by_id])
   end

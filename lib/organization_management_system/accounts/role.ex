@@ -19,7 +19,6 @@ defmodule OrganizationManagementSystem.Accounts.Role do
 
   @doc false
   def changeset(role, attrs, scope) do
-
     role
     |> cast(attrs, [:name, :scope, :description, :system?])
     |> validate_required([:name, :scope, :description, :system?])

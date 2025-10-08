@@ -56,6 +56,18 @@ defmodule OrganizationManagementSystemWeb.ConnCase do
     %{conn: log_in_user(conn, user, opts), user: user, scope: scope}
   end
 
+  def register_and_log_in_super_user(%{conn: conn} = context) do
+    user = OrganizationManagementSystem.AccountsFixtures.user_fixture(is_super_user?: true)
+    scope = OrganizationManagementSystem.Accounts.Scope.for_user(user)
+
+    opts =
+      context
+      |> Map.take([:token_authenticated_at])
+      |> Enum.into([])
+
+    %{conn: log_in_user(conn, user, opts), user: user, scope: scope}
+  end
+
   @doc """
   Logs the given `user` into the `conn`.
 

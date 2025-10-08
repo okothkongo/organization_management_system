@@ -15,7 +15,12 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
 
       <.form for={@form} id="role-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:name]} type="text" label="Name" />
-        <.input field={@form[:scope]} type="text" label="Scope" />
+        <.input
+          field={@form[:scope]}
+          type="select"
+          label="Scope"
+          options={Ecto.Enum.values(Role, :scope) |> Enum.map(&{Phoenix.Naming.humanize(&1), &1})}
+        />
         <.input field={@form[:description]} type="text" label="Description" />
         <.input field={@form[:system?]} type="checkbox" label="System?" />
         <footer>
@@ -58,7 +63,9 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
 
   @impl true
   def handle_event("validate", %{"role" => role_params}, socket) do
-    changeset = Accounts.change_role(socket.assigns.current_scope, socket.assigns.role, role_params)
+    changeset =
+      Accounts.change_role(socket.assigns.current_scope, socket.assigns.role, role_params)
+
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 

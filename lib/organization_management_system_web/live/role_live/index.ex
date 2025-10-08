@@ -46,14 +46,14 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      Accounts.subscribe_roles(socket.assigns.current_scope)
-    end
+    # if connected?(socket) do
+    #   Accounts.subscribe_roles(socket.assigns.current_scope)
+    # end
 
     {:ok,
      socket
      |> assign(:page_title, "Listing Roles")
-     |> stream(:roles, list_roles(socket.assigns.current_scope))}
+     |> stream(:roles, list_roles())}
   end
 
   @impl true
@@ -67,10 +67,10 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Index do
   @impl true
   def handle_info({type, %OrganizationManagementSystem.Accounts.Role{}}, socket)
       when type in [:created, :updated, :deleted] do
-    {:noreply, stream(socket, :roles, list_roles(socket.assigns.current_scope), reset: true)}
+    {:noreply, stream(socket, :roles, list_roles(), reset: true)}
   end
 
-  defp list_roles(current_scope) do
-    Accounts.list_roles(current_scope)
+  defp list_roles do
+    Accounts.list_roles()
   end
 end

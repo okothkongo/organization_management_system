@@ -422,26 +422,51 @@ defmodule OrganizationManagementSystem.AccountsTest do
     end
 
     test "create_role/2 with valid data creates a role" do
-      valid_attrs = %{name: "some name", scope: "some scope", description: "some description", system?: true}
-      scope = user_scope_fixture()
+      valid_attrs = %{
+        name: "some name",
+        scope: :all,
+        description: "some description",
+        system?: true
+      }
+
+      scope = super_user_scope_fixture()
 
       assert {:ok, %Role{} = role} = Accounts.create_role(scope, valid_attrs)
       assert role.name == "some name"
-      assert role.scope == "some scope"
+      assert role.scope == :all
       assert role.description == "some description"
       assert role.system? == true
-      assert role.user_id == scope.user.id
+      assert role.created_by_id == scope.user.id
+    end
+
+    test "create_role/2 non superuser cannot create role" do
+      valid_attrs = %{
+        name: "some name",
+        scope: :all,
+        description: "some description",
+        system?: true
+      }
+
+      scope = user_scope_fixture()
+
+      refute Accounts.create_role(scope, valid_attrs)
     end
 
     test "create_role/2 with invalid data returns error changeset" do
-      scope = user_scope_fixture()
+      scope = super_user_scope_fixture()
       assert {:error, %Ecto.Changeset{}} = Accounts.create_role(scope, @invalid_attrs)
     end
 
     test "update_role/3 with valid data updates the role" do
       scope = user_scope_fixture()
       role = role_fixture(scope)
-      update_attrs = %{name: "some updated name", scope: "some updated scope", description: "some updated description", system?: false}
+
+      update_attrs = %{
+        name: "some updated name",
+        scope: "some updated scope",
+        description: "some updated description",
+        system?: false
+      }
 
       assert {:ok, %Role{} = role} = Accounts.update_role(scope, role, update_attrs)
       assert role.name == "some updated name"

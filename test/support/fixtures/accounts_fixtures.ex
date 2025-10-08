@@ -47,6 +47,11 @@ defmodule OrganizationManagementSystem.AccountsFixtures do
     user_scope_fixture(user)
   end
 
+  def super_user_scope_fixture do
+    user = user_fixture(is_super_user?: true)
+    user_scope_fixture(user)
+  end
+
   def user_scope_fixture(user) do
     Scope.for_user(user)
   end
@@ -96,7 +101,7 @@ defmodule OrganizationManagementSystem.AccountsFixtures do
       Enum.into(attrs, %{
         description: "some description",
         name: "some name",
-        scope: "some scope",
+        scope: :all,
         system?: true
       })
 
