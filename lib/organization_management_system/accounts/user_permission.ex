@@ -1,4 +1,7 @@
 defmodule OrganizationManagementSystem.Accounts.UserPermission do
+  @moduledoc """
+  UserPermission Schema
+  """
   use Ecto.Schema
   import Ecto.Changeset
   alias OrganizationManagementSystem.Accounts.Permission

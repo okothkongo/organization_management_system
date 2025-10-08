@@ -330,7 +330,7 @@ defmodule OrganizationManagementSystem.Accounts do
       [%Role{}, ...]
 
   """
-  def list_roles() do
+  def list_roles do
     Repo.all(Role)
   end
 

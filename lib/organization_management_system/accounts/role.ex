@@ -1,4 +1,7 @@
 defmodule OrganizationManagementSystem.Accounts.Role do
+  @moduledoc """
+   Role Schema
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
