@@ -7,7 +7,10 @@ defmodule OrganizationManagementSystemWeb.UserLive.ConfirmationTest do
   alias OrganizationManagementSystem.Accounts
 
   setup do
-    %{unconfirmed_user: unconfirmed_user_fixture(), confirmed_user: user_fixture()}
+    %{
+      unconfirmed_user: unconfirmed_user_fixture(status: :approved),
+      confirmed_user: user_fixture()
+    }
   end
 
   describe "Confirm user" do

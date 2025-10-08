@@ -5,6 +5,7 @@ defmodule OrganizationManagementSystemWeb.UserAuthTest do
   alias OrganizationManagementSystem.Accounts
   alias OrganizationManagementSystem.Accounts.Scope
   alias OrganizationManagementSystemWeb.UserAuth
+  alias OrganizationManagementSystem.Factory
 
   import OrganizationManagementSystem.AccountsFixtures
 
@@ -20,7 +21,10 @@ defmodule OrganizationManagementSystemWeb.UserAuthTest do
       )
       |> init_test_session(%{})
 
-    %{user: %{user_fixture() | authenticated_at: DateTime.utc_now(:second)}, conn: conn}
+    %{
+      user: Factory.insert!(:approved_user, authenticated_at: DateTime.utc_now(:second)),
+      conn: conn
+    }
   end
 
   describe "log_in_user/3" do
