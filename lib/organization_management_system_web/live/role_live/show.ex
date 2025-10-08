@@ -48,18 +48,10 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Show do
     {:noreply, assign(socket, :role, role)}
   end
 
-  def handle_info(
-        {:deleted, %OrganizationManagementSystem.Accounts.Role{id: id}},
-        %{assigns: %{role: %{id: id}}} = socket
-      ) do
-    {:noreply,
-     socket
-     |> put_flash(:error, "The current role was deleted.")
-     |> push_navigate(to: ~p"/roles")}
-  end
+
 
   def handle_info({type, %OrganizationManagementSystem.Accounts.Role{}}, socket)
-      when type in [:created, :updated, :deleted] do
+      when type in [:created, :updated] do
     {:noreply, socket}
   end
 end

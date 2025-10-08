@@ -31,14 +31,7 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Index do
           </div>
 
         </:action>
-        <:action :let={{id, role}}>
-          <.link
-            phx-click={JS.push("delete", value: %{id: role.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
-          >
-            Delete
-          </.link>
-        </:action>
+
       </.table>
     </Layouts.app>
     """
@@ -56,19 +49,8 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Index do
      |> stream(:roles, list_roles())}
   end
 
-  @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    role = Accounts.get_role!(socket.assigns.current_scope, id)
-    {:ok, _} = Accounts.delete_role(socket.assigns.current_scope, role)
 
-    {:noreply, stream_delete(socket, :roles, role)}
-  end
 
-  @impl true
-  def handle_info({type, %OrganizationManagementSystem.Accounts.Role{}}, socket)
-      when type in [:created, :updated, :deleted] do
-    {:noreply, stream(socket, :roles, list_roles(), reset: true)}
-  end
 
   defp list_roles do
     Accounts.list_roles()

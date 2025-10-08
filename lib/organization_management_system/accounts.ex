@@ -375,27 +375,6 @@ defmodule OrganizationManagementSystem.Accounts do
     end
   end
 
-  @doc """
-  Deletes a role.
-
-  ## Examples
-
-      iex> delete_role(scope, role)
-      {:ok, %Role{}}
-
-      iex> delete_role(scope, role)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_role(%Scope{} = scope, %Role{} = role) do
-    true = role.user_id == scope.user.id
-
-    with {:ok, role = %Role{}} <-
-           Repo.delete(role) do
-      broadcast_role(scope, {:deleted, role})
-      {:ok, role}
-    end
-  end
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking role changes.

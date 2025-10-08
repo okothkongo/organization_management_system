@@ -457,19 +457,6 @@ defmodule OrganizationManagementSystem.AccountsTest do
       assert {:error, %Ecto.Changeset{}} = Accounts.create_role(scope, @invalid_attrs)
     end
 
-    test "delete_role/2 deletes the role" do
-      scope = user_scope_fixture()
-      role = role_fixture(scope)
-      assert {:ok, %Role{}} = Accounts.delete_role(scope, role)
-      assert_raise Ecto.NoResultsError, fn -> Accounts.get_role!(scope, role.id) end
-    end
-
-    test "delete_role/2 with invalid scope raises" do
-      scope = user_scope_fixture()
-      other_scope = user_scope_fixture()
-      role = role_fixture(scope)
-      assert_raise MatchError, fn -> Accounts.delete_role(other_scope, role) end
-    end
 
     test "change_role/2 returns a role changeset" do
       scope = user_scope_fixture()
