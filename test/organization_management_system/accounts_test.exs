@@ -395,4 +395,96 @@ defmodule OrganizationManagementSystem.AccountsTest do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
     end
   end
+
+  describe "roles" do
+    alias OrganizationManagementSystem.Accounts.Role
+
+    import OrganizationManagementSystem.AccountsFixtures, only: [user_scope_fixture: 0]
+    import OrganizationManagementSystem.AccountsFixtures
+
+    @invalid_attrs %{name: nil, scope: nil, description: nil, system?: nil}
+
+    test "list_roles/1 returns all scoped roles" do
+      scope = user_scope_fixture()
+      other_scope = user_scope_fixture()
+      role = role_fixture(scope)
+      other_role = role_fixture(other_scope)
+      assert Accounts.list_roles(scope) == [role]
+      assert Accounts.list_roles(other_scope) == [other_role]
+    end
+
+    test "get_role!/2 returns the role with given id" do
+      scope = user_scope_fixture()
+      role = role_fixture(scope)
+      other_scope = user_scope_fixture()
+      assert Accounts.get_role!(scope, role.id) == role
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_role!(other_scope, role.id) end
+    end
+
+    test "create_role/2 with valid data creates a role" do
+      valid_attrs = %{name: "some name", scope: "some scope", description: "some description", system?: true}
+      scope = user_scope_fixture()
+
+      assert {:ok, %Role{} = role} = Accounts.create_role(scope, valid_attrs)
+      assert role.name == "some name"
+      assert role.scope == "some scope"
+      assert role.description == "some description"
+      assert role.system? == true
+      assert role.user_id == scope.user.id
+    end
+
+    test "create_role/2 with invalid data returns error changeset" do
+      scope = user_scope_fixture()
+      assert {:error, %Ecto.Changeset{}} = Accounts.create_role(scope, @invalid_attrs)
+    end
+
+    test "update_role/3 with valid data updates the role" do
+      scope = user_scope_fixture()
+      role = role_fixture(scope)
+      update_attrs = %{name: "some updated name", scope: "some updated scope", description: "some updated description", system?: false}
+
+      assert {:ok, %Role{} = role} = Accounts.update_role(scope, role, update_attrs)
+      assert role.name == "some updated name"
+      assert role.scope == "some updated scope"
+      assert role.description == "some updated description"
+      assert role.system? == false
+    end
+
+    test "update_role/3 with invalid scope raises" do
+      scope = user_scope_fixture()
+      other_scope = user_scope_fixture()
+      role = role_fixture(scope)
+
+      assert_raise MatchError, fn ->
+        Accounts.update_role(other_scope, role, %{})
+      end
+    end
+
+    test "update_role/3 with invalid data returns error changeset" do
+      scope = user_scope_fixture()
+      role = role_fixture(scope)
+      assert {:error, %Ecto.Changeset{}} = Accounts.update_role(scope, role, @invalid_attrs)
+      assert role == Accounts.get_role!(scope, role.id)
+    end
+
+    test "delete_role/2 deletes the role" do
+      scope = user_scope_fixture()
+      role = role_fixture(scope)
+      assert {:ok, %Role{}} = Accounts.delete_role(scope, role)
+      assert_raise Ecto.NoResultsError, fn -> Accounts.get_role!(scope, role.id) end
+    end
+
+    test "delete_role/2 with invalid scope raises" do
+      scope = user_scope_fixture()
+      other_scope = user_scope_fixture()
+      role = role_fixture(scope)
+      assert_raise MatchError, fn -> Accounts.delete_role(other_scope, role) end
+    end
+
+    test "change_role/2 returns a role changeset" do
+      scope = user_scope_fixture()
+      role = role_fixture(scope)
+      assert %Ecto.Changeset{} = Accounts.change_role(scope, role)
+    end
+  end
 end

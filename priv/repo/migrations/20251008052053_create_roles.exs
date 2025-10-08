@@ -7,8 +7,10 @@ defmodule OrganizationManagementSystem.Repo.Migrations.CreateRoles do
       add :scope, :string
       add :decription, :string
       add :system?, :boolean, default: false, null: false
+      add :created_by_id, references(:users, on_delete: :nothing), null: false
 
       timestamps(type: :utc_datetime)
     end
+    create index(:roles, [:created_by_id])
   end
 end

@@ -294,4 +294,143 @@ defmodule OrganizationManagementSystem.Accounts do
       end
     end)
   end
+
+  alias OrganizationManagementSystem.Accounts.Role
+  alias OrganizationManagementSystem.Accounts.Scope
+
+  @doc """
+  Subscribes to scoped notifications about any role changes.
+
+  The broadcasted messages match the pattern:
+
+    * {:created, %Role{}}
+    * {:updated, %Role{}}
+    * {:deleted, %Role{}}
+
+  """
+  def subscribe_roles(%Scope{} = scope) do
+    key = scope.user.id
+
+    Phoenix.PubSub.subscribe(OrganizationManagementSystem.PubSub, "user:#{key}:roles")
+  end
+
+  defp broadcast_role(%Scope{} = scope, message) do
+    key = scope.user.id
+
+    Phoenix.PubSub.broadcast(OrganizationManagementSystem.PubSub, "user:#{key}:roles", message)
+  end
+
+  @doc """
+  Returns the list of roles.
+
+  ## Examples
+
+      iex> list_roles(scope)
+      [%Role{}, ...]
+
+  """
+  def list_roles(%Scope{} = scope) do
+    Repo.all_by(Role, user_id: scope.user.id)
+  end
+
+  @doc """
+  Gets a single role.
+
+  Raises `Ecto.NoResultsError` if the Role does not exist.
+
+  ## Examples
+
+      iex> get_role!(scope, 123)
+      %Role{}
+
+      iex> get_role!(scope, 456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_role!(%Scope{} = scope, id) do
+    Repo.get_by!(Role, id: id, user_id: scope.user.id)
+  end
+
+  @doc """
+  Creates a role.
+
+  ## Examples
+
+      iex> create_role(scope, %{field: value})
+      {:ok, %Role{}}
+
+      iex> create_role(scope, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_role(%Scope{} = scope, attrs) do
+    with {:ok, role = %Role{}} <-
+           %Role{}
+           |> Role.changeset(attrs, scope)
+           |> Repo.insert() do
+      broadcast_role(scope, {:created, role})
+      {:ok, role}
+    end
+  end
+
+  @doc """
+  Updates a role.
+
+  ## Examples
+
+      iex> update_role(scope, role, %{field: new_value})
+      {:ok, %Role{}}
+
+      iex> update_role(scope, role, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_role(%Scope{} = scope, %Role{} = role, attrs) do
+    true = role.user_id == scope.user.id
+
+    with {:ok, role = %Role{}} <-
+           role
+           |> Role.changeset(attrs, scope)
+           |> Repo.update() do
+      broadcast_role(scope, {:updated, role})
+      {:ok, role}
+    end
+  end
+
+  @doc """
+  Deletes a role.
+
+  ## Examples
+
+      iex> delete_role(scope, role)
+      {:ok, %Role{}}
+
+      iex> delete_role(scope, role)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_role(%Scope{} = scope, %Role{} = role) do
+    true = role.user_id == scope.user.id
+
+    with {:ok, role = %Role{}} <-
+           Repo.delete(role) do
+      broadcast_role(scope, {:deleted, role})
+      {:ok, role}
+    end
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking role changes.
+
+  ## Examples
+
+      iex> change_role(scope, role)
+      %Ecto.Changeset{data: %Role{}}
+
+  """
+  def change_role(%Scope{} = scope, %Role{} = role, attrs \\ %{}) do
+    true = role.user_id == scope.user.id
+
+    Role.changeset(role, attrs, scope)
+  end
 end

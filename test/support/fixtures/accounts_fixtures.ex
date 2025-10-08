@@ -87,4 +87,20 @@ defmodule OrganizationManagementSystem.AccountsFixtures do
       set: [inserted_at: dt, authenticated_at: dt]
     )
   end
+
+  @doc """
+  Generate a role.
+  """
+  def role_fixture(scope, attrs \\ %{}) do
+    attrs =
+      Enum.into(attrs, %{
+        description: "some description",
+        name: "some name",
+        scope: "some scope",
+        system?: true
+      })
+
+    {:ok, role} = OrganizationManagementSystem.Accounts.create_role(scope, attrs)
+    role
+  end
 end
