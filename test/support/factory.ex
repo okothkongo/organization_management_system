@@ -56,7 +56,7 @@ defmodule OrganizationManagementSystem.Factory do
 
   def build(:role) do
     %Role{
-      name: "user_reviewer",
+      name: "role_#{System.unique_integer()}",
       created_by: build(:super_user),
       description: "some role",
       scope: :all

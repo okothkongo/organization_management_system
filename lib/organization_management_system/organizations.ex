@@ -8,6 +8,8 @@ defmodule OrganizationManagementSystem.Organizations do
 
   alias OrganizationManagementSystem.Organizations.Organization
   alias OrganizationManagementSystem.Accounts.Scope
+  alias OrganizationManagementSystem.Accounts.Role
+  alias OrganizationManagementSystem.Organizations.OrganizationUser
 
   @doc """
   Subscribes to scoped notifications about any organization changes.
@@ -72,5 +74,48 @@ defmodule OrganizationManagementSystem.Organizations do
 
   def change_organization(%Scope{} = scope, %Organization{} = organization, attrs \\ %{}) do
     Organization.changeset(organization, attrs, scope)
+  end
+
+  @doc """
+  Lists all users belonging to the given organization.
+
+  ## Examples
+
+      iex> list_users(organization)
+      [%User{}, ...]
+
+  """
+  def list_organization_members(org_id) do
+    query =
+      from(u in OrganizationManagementSystem.Accounts.User,
+        join: ou in OrganizationManagementSystem.Organizations.OrganizationUser,
+        on: ou.user_id == u.id,
+        where: ou.organisation_id == ^org_id
+      )
+
+    Repo.all(query)
+  end
+
+  def list_roles_by_organization(organisation_id) do
+    query =
+      from(r in Role,
+        where: r.organisation_id == ^organisation_id
+      )
+
+    Repo.all(query)
+  end
+
+  def change_organization_user(
+        %Scope{} = scope,
+        %OrganizationUser{} = organization_user,
+        attrs \\ %{}
+      ) do
+    OrganizationUser.changeset(organization_user, attrs, scope)
+  end
+
+  def create_organization_user(%Scope{} = scope, attrs) do
+    %OrganizationUser{}
+    |> OrganizationUser.changeset(attrs, scope)
+    |> Repo.insert()
   end
 end

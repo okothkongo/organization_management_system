@@ -21,6 +21,17 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
         rows={@streams.organisations}
       >
         <:col :let={{_id, organization}} label="Name">{organization.name}</:col>
+        <:col :let={{id, organization}}>
+          <.button
+            variant="primary"
+            phx-click="view_members"
+            phx-value-id={organization.id}
+            id={"view-members-btn-#{id}"}
+            class="flex items-center gap-2"
+          >
+            <.icon name="hero-users" /> View Members
+          </.button>
+        </:col>
       </.table>
     </Layouts.app>
     """
@@ -42,6 +53,11 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
   def handle_info({type, %OrganizationManagementSystem.Organizations.Organization{}}, socket)
       when type in [:created] do
     {:noreply, stream(socket, :organisations, list_organisations(), reset: true)}
+  end
+
+  @impl true
+  def handle_event("view_members", %{"id" => org_id}, socket) do
+    {:noreply, push_navigate(socket, to: ~p"/organisations/members?org_id=#{org_id}")}
   end
 
   defp list_organisations do

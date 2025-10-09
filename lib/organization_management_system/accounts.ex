@@ -492,4 +492,8 @@ defmodule OrganizationManagementSystem.Accounts do
 
     Repo.one(query)
   end
+
+  def list_users do
+    Repo.all(User)
+  end
 end
