@@ -4,7 +4,7 @@ defmodule OrganizationManagementSystem.Organizations.Organization do
 
   schema "organisations" do
     field :name, :string
-    field :created_by_id, :id
+    belongs_to :created_by, OrganizationManagementSystem.Accounts.User
 
     timestamps(type: :utc_datetime)
   end

@@ -10,5 +10,7 @@ defmodule OrganizationManagementSystem.Repo.Migrations.CreateOrganisation do
     end
 
     create index(:organisations, [:created_by_id])
+    create unique_index(:organization_users, [:organization_id, :user_id])
+    create index(:organization_users, [:role_id])
   end
 end
