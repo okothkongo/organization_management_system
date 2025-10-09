@@ -37,8 +37,6 @@ defmodule OrganizationManagementSystem.Accounts.Role do
   def validate_organisation(
         %Ecto.Changeset{changes: %{scope: :all, organisation_id: _id}} = changeset
       ) do
-    IO.inspect("ooooo")
-
     add_error(changeset, :organisation_id, "Only organisation scope role require organisation")
   end
 

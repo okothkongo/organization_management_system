@@ -36,7 +36,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.IndexTest do
       reviewer = Factory.insert!(:user)
       global_role = Factory.insert!(:role, scope: :all, name: "user_reviewer")
 
-      permission = Factory.insert!(:permission, action: "some_action_#{System.unique_integer()}")
+      permission = Factory.insert!(:permission, action: "review:stage:invited")
       Factory.insert!(:role_permission, role: global_role, permission: permission)
       Factory.insert!(:user_permission, user: reviewer, permission: permission)
       conn = log_in_user(conn, reviewer)
@@ -60,7 +60,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.IndexTest do
       approver = Factory.insert!(:user)
       global_role = Factory.insert!(:role, scope: :all, name: "user_approver")
 
-      permission = Factory.insert!(:permission, action: "some_action_#{System.unique_integer()}")
+      permission = Factory.insert!(:permission, action: "review:stage:reviewed")
       Factory.insert!(:role_permission, role: global_role, permission: permission)
       Factory.insert!(:user_permission, user: approver, permission: permission)
 
@@ -68,6 +68,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.IndexTest do
       {:ok, view, html} = live(conn, ~p"/users")
       assert html =~ reviewed_user.name
       assert html =~ "Approve"
+      #  refute html =~ "Review"
 
       # Simulate clicking approve
       view
