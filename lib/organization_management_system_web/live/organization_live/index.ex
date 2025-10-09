@@ -55,6 +55,7 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
     {:noreply, stream(socket, :organisations, list_organisations(), reset: true)}
   end
 
+  @impl true
   def handle_event("view_members", %{"id" => org_id}, socket) do
     {:noreply, push_navigate(socket, to: ~p"/organisations/members?org_id=#{org_id}")}
   end

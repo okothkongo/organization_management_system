@@ -67,7 +67,6 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Form do
 
   @impl true
   def handle_event("validate", %{"organization_user" => organization_user_params}, socket) do
-
     organization_user_params =
       Map.put_new(organization_user_params, "organisation_id", socket.assigns.org_id)
 
@@ -115,8 +114,10 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Form do
     OrganizationManagementSystem.Accounts.list_users()
     |> Enum.map(&{&1.email, &1.id})
   end
+
   defp list_organization_roles(org_id) do
-    OrganizationManagementSystem.Organizations.list_roles_by_organization(org_id)
+    org_id
+    |> OrganizationManagementSystem.Organizations.list_roles_by_organization()
     |> Enum.map(&{&1.name, &1.id})
   end
 end

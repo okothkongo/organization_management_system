@@ -86,20 +86,23 @@ defmodule OrganizationManagementSystem.Organizations do
 
   """
   def list_organization_members(org_id) do
-    from(u in OrganizationManagementSystem.Accounts.User,
-      join: ou in OrganizationManagementSystem.Organizations.OrganizationUser,
-      on: ou.user_id == u.id,
-      where: ou.organisation_id == ^org_id
-    )
-    |> Repo.all()
+    query =
+      from(u in OrganizationManagementSystem.Accounts.User,
+        join: ou in OrganizationManagementSystem.Organizations.OrganizationUser,
+        on: ou.user_id == u.id,
+        where: ou.organisation_id == ^org_id
+      )
+
+    Repo.all(query)
   end
 
-
   def list_roles_by_organization(organisation_id) do
-    from(r in Role,
-      where:  r.organisation_id == ^organisation_id
-    )
-    |> Repo.all()
+    query =
+      from(r in Role,
+        where: r.organisation_id == ^organisation_id
+      )
+
+    Repo.all(query)
   end
 
   def change_organization_user(

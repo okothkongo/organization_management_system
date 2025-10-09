@@ -17,8 +17,8 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
   describe "super user" do
     setup :register_and_log_in_super_user
 
-    defp create_role(%{scope: scope}) do
-      role = role_fixture(scope)
+    defp create_role() do
+      role = Factory.insert!(:role)
 
       %{role: role}
     end

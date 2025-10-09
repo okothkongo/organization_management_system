@@ -518,7 +518,7 @@ defmodule OrganizationManagementSystem.AccountsTest do
 
     test "returns global roles assigned to the user" do
       user = Factory.insert!(:user)
-      global_role = Factory.insert!(:role, scope: :all)
+      global_role = Factory.insert!(:role, scope: :all, name: "user_reviewer")
 
       permission = Factory.insert!(:permission, action: "some_action_#{System.unique_integer()}")
       Factory.insert!(:role_permission, role: global_role, permission: permission)
@@ -538,7 +538,7 @@ defmodule OrganizationManagementSystem.AccountsTest do
 
     test "returns only global roles when user has both global and non-global roles" do
       user = Factory.insert!(:user)
-      global_role = Factory.insert!(:role, scope: :all)
+      global_role = Factory.insert!(:role, scope: :all, name: "user_reviewer")
       non_global_role = Factory.insert!(:role, scope: :organisation)
       permission = Factory.insert!(:permission, action: "some_action_#{System.unique_integer()}")
       permission2 = Factory.insert!(:permission, action: "some_action_#{System.unique_integer()}")
