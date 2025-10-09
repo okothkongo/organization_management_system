@@ -1,0 +1,76 @@
+defmodule OrganizationManagementSystem.Organizations do
+  @moduledoc """
+  The Organizations context.
+  """
+
+  import Ecto.Query, warn: false
+  alias OrganizationManagementSystem.Repo
+
+  alias OrganizationManagementSystem.Organizations.Organization
+  alias OrganizationManagementSystem.Accounts.Scope
+
+  @doc """
+  Subscribes to scoped notifications about any organization changes.
+
+  The broadcasted messages match the pattern:
+
+    * {:created, %Organization{}}
+    * {:updated, %Organization{}}
+    * {:deleted, %Organization{}}
+
+  """
+  def subscribe_organisations(%Scope{} = scope) do
+    key = scope.user.id
+
+    Phoenix.PubSub.subscribe(OrganizationManagementSystem.PubSub, "user:#{key}:organisations")
+  end
+
+  defp broadcast_organization(%Scope{} = scope, message) do
+    key = scope.user.id
+
+    Phoenix.PubSub.broadcast(
+      OrganizationManagementSystem.PubSub,
+      "user:#{key}:organisations",
+      message
+    )
+  end
+
+  @doc """
+  Creates a organization.
+
+  ## Examples
+
+      iex> create_organization(scope, %{field: value})
+      {:ok, %Organization{}}
+
+      iex> create_organization(scope, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_organization(%Scope{} = scope, attrs) do
+    with {:ok, organization = %Organization{}} <-
+           %Organization{}
+           |> Organization.changeset(attrs, scope)
+           |> Repo.insert() do
+      broadcast_organization(scope, {:created, organization})
+      {:ok, organization}
+    end
+  end
+
+  @doc """
+  Returns the list of all organizations.
+
+  ## Examples
+
+      iex> list_organisations()
+      [%Organization{}, ...]
+
+  """
+  def list_organisations do
+    Repo.all(Organization)
+  end
+
+  def change_organization(%Scope{} = scope, %Organization{} = organization, attrs \\ %{}) do
+    Organization.changeset(organization, attrs, scope)
+  end
+end

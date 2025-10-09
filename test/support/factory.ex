@@ -78,6 +78,13 @@ defmodule OrganizationManagementSystem.Factory do
     }
   end
 
+  def build(:organization) do
+    %OrganizationManagementSystem.Organizations.Organization{
+      name: "Some Organization",
+      created_by: build(:super_user)
+    }
+  end
+
   # Convenience API
 
   def build(factory_name, attributes) do
