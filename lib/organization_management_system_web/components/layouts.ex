@@ -167,6 +167,13 @@ defmodule OrganizationManagementSystemWeb.Layouts do
               >
                 <.icon name="hero-user-plus" class="mr-4 size-6 shrink-0 text-primary-200" /> Users
               </.link>
+              <.link
+                navigate={~p"/organisations"}
+                class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
+              >
+                <.icon name="hero-building-office" class="mr-4 size-6 shrink-0 text-primary-200" />
+                Organisations
+              </.link>
             <% else %>
               <.link
                 navigate={~p"/dashboard"}

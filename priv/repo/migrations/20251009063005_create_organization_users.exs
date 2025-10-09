@@ -2,19 +2,19 @@ defmodule OrganizationManagementSystem.Repo.Migrations.CreateOrganizationUsers d
   use Ecto.Migration
 
   def change do
-    create table(:organization_users) do
-      add :organization_id, references(:organizations, on_delete: :nothing)
+    create table(:organisation_users) do
+      add :organisation_id, references(:organisations, on_delete: :nothing)
       add :user_id, references(:users, on_delete: :nothing)
       add :invited_by_id, references(:users, on_delete: :nothing)
-      add :user_id, references(:users, type: :id, on_delete: :delete_all)
+      add :role_id, references(:roles, on_delete: :nothing)
 
       timestamps(type: :utc_datetime)
     end
 
-    create index(:organization_users, [:user_id])
-
-    create index(:organization_users, [:organization_id])
-    create index(:organization_users, [:user_id])
-    create index(:organization_users, [:invited_by_id])
+    create index(:organisation_users, [:organisation_id])
+    create index(:organisation_users, [:user_id])
+    create index(:organisation_users, [:invited_by_id])
+    create unique_index(:organisation_users, [:organisation_id, :user_id])
+    create index(:organisation_users, [:role_id])
   end
 end

@@ -1,4 +1,7 @@
 defmodule OrganizationManagementSystem.Organizations.Organization do
+  @moduledoc """
+  The Organization schema.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
