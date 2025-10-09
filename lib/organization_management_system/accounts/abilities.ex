@@ -16,6 +16,11 @@ defmodule OrganizationManagementSystem.Accounts.Abilities do
 
   alias OrganizationManagementSystem.Accounts
 
+  @approve_user_permission "review:stage:reviewed"
+  @review_user_permission "review:stage:invited"
+  @create_organisation_permission "org:create"
+
+
   def can_create_role?(current_user) do
     current_user.is_super_user?
   end
@@ -25,18 +30,23 @@ defmodule OrganizationManagementSystem.Accounts.Abilities do
   end
 
   def can_review_or_approve?(current_user) do
-    current_user.id
-    |> Accounts.get_global_roles_by_user_id_and_role_names(["user_reviewer", "user_approver"])
-    |> Enum.empty?()
-    |> Kernel.!()
+    can_approve_user?(current_user) or can_review_user?(current_user)
   end
 
-  def can_create_organisation?(%{is_super_user?: true}), do: true
+  def can_create_organisation?(user) do
+    user.is_super_user? or @create_organisation_permission in get_permissions_actions(user.id)
+  end
 
-  def can_create_organisation?(current_user) do
-    current_user.id
-    |> Accounts.get_global_roles_by_user_id_and_role_names(["organisation create"])
-    |> Enum.empty?()
-    |> Kernel.!()
+  def can_approve_user?(user) do
+    user.is_super_user? or
+      @approve_user_permission in get_permissions_actions(user.id)
+  end
+
+  def can_review_user?(user) do
+    user.is_super_user? or @review_user_permission in get_permissions_actions(user.id)
+  end
+
+  defp get_permissions_actions(user_id) do
+    user_id |> Accounts.get_permissions_by_user_id() |> Enum.map(& &1.action)
   end
 end

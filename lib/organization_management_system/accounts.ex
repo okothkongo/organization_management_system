@@ -15,8 +15,6 @@ defmodule OrganizationManagementSystem.Accounts do
   alias OrganizationManagementSystem.Accounts.Scope
   alias OrganizationManagementSystem.Accounts.Permission
 
-  @roles_who_review_and_approve_user ["user_reviewer", "user_approver"]
-
   ## Database getters
 
   @doc """
@@ -424,42 +422,40 @@ defmodule OrganizationManagementSystem.Accounts do
   end
 
   def list_users(%{user: user}) do
-    case get_global_roles_by_user_id_and_role_names(user.id, @roles_who_review_and_approve_user) do
-      [%{name: "user_approver"}] ->
-        Repo.all_by(User, status: :reviewed)
+    cond do
+      user.is_super_user? ->
+        Repo.all(User)
 
-      [%{name: "user_reviewer"}] ->
+      Abilities.can_review_user?(user) ->
         Repo.all_by(User, status: :invited)
 
-      _ ->
+      Abilities.can_approve_user?(user) ->
+        Repo.all_by(User, status: :reviewed)
+
+      true ->
         []
     end
   end
 
   @doc """
-  Returns the list of roles for a given user_id.
+  Returns the list of permissions for a given user_id.
 
-  This function joins the user_permissions and role_permissions tables
-  to find all roles assigned to the user, either directly or via permissions.
+  This function joins the user_permissions and permissions tables
+  to find all permissions assigned to the user.
 
   ## Examples
 
-    iex> get_global_roles_by_user_id(1)
-    [%Role{}, ...]
+      iex> get_permissions_by_user_id(1)
+      [%Permission{}, ...]
   """
-
-  def get_global_roles_by_user_id_and_role_names(user_id, role_names) do
+  @spec get_permissions_by_user_id(integer()) :: [Permission.t()]
+  def get_permissions_by_user_id(user_id) do
     query =
-      from(r in Role,
-        join: rp in RolePermission,
-        on: rp.role_id == r.id,
+      from p in Permission,
         join: up in UserPermission,
-        on: up.permission_id == rp.permission_id,
-        where:
-          up.user_id == ^user_id and r.scope == :all and
-            r.name in ^role_names,
-        select: r
-      )
+        on: up.permission_id == p.id,
+        where: up.user_id == ^user_id,
+        select: p
 
     Repo.all(query)
   end

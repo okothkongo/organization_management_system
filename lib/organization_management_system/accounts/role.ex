@@ -31,5 +31,14 @@ defmodule OrganizationManagementSystem.Accounts.Role do
     |> cast(attrs, [:name, :scope, :description, :system?, :permission_id])
     |> validate_required([:name, :scope, :description, :system?, :permission_id])
     |> put_change(:created_by_id, scope.user.id)
+    |> validate_organisation()
   end
+
+  def validate_organisation(
+        %Ecto.Changeset{changes: %{scope: :all, organisation_id: _id}} = changeset
+      ) do
+    add_error(changeset, :organisation_id, "Only organisation scope role require organisation")
+  end
+
+  def validate_organisation(changeset), do: changeset
 end

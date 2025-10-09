@@ -163,7 +163,7 @@ defmodule OrganizationManagementSystemWeb.Layouts do
                 <.icon name="hero-users" class="mr-4 size-6 shrink-0 text-primary-200" /> Roles
               </.link>
             <% end %>
-            <%= if @current_scope.user.is_super_user? or can_review_or_approve?(@current_scope.user)  do %>
+            <%= if Abilities.can_review_or_approve?(@current_scope.user) do %>
               <.link
                 navigate={~p"/users"}
                 class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
