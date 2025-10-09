@@ -2,7 +2,7 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
   use OrganizationManagementSystemWeb.ConnCase
 
   import Phoenix.LiveViewTest
-  import OrganizationManagementSystem.AccountsFixtures
+
   alias OrganizationManagementSystem.Factory
 
   @create_attrs %{
@@ -17,7 +17,7 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
   describe "super user" do
     setup :register_and_log_in_super_user
 
-    defp create_role() do
+    defp create_role(%{scope: _scope}) do
       role = Factory.insert!(:role)
 
       %{role: role}
