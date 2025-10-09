@@ -5,6 +5,8 @@ defmodule OrganizationManagementSystemWeb.Layouts do
   """
   use OrganizationManagementSystemWeb, :html
 
+  alias OrganizationManagementSystem.Accounts.Abilities
+
   # Embed all files in layouts/* within this module.
   # The default root.html.heex file contains the HTML
   # skeleton of your application, namely HTML headers
@@ -143,30 +145,33 @@ defmodule OrganizationManagementSystemWeb.Layouts do
           class="mt-6 flex flex-1 flex-col divide-y divide-primary-800 overflow-y-auto"
         >
           <div class="space-y-1 px-2">
-            <%= if @current_scope && Map.get(@current_scope.user, :is_super_user?, false) do %>
-              <.link
-                navigate={~p"/dashboard"}
-                aria-current="page"
-                class={[
-                  "group flex items-center rounded-md px-2 py-2 text-sm font-medium",
-                  "bg-primary-800 text-white"
-                ]}
-              >
-                <.icon name="hero-home" class="mr-4 size-6 shrink-0 text-primary-200" /> Dashboard
-              </.link>
-
+            <.link
+              navigate={~p"/dashboard"}
+              aria-current="page"
+              class={[
+                "group flex items-center rounded-md px-2 py-2 text-sm font-medium",
+                "bg-primary-800 text-white"
+              ]}
+            >
+              <.icon name="hero-home" class="mr-4 size-6 shrink-0 text-primary-200" /> Dashboard
+            </.link>
+            <%= if @current_scope.user.is_super_user? do %>
               <.link
                 navigate={~p"/roles"}
                 class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
               >
                 <.icon name="hero-users" class="mr-4 size-6 shrink-0 text-primary-200" /> Roles
               </.link>
+            <% end %>
+            <%= if @current_scope.user.is_super_user? or can_review_or_approve?(@current_scope.user)  do %>
               <.link
                 navigate={~p"/users"}
                 class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
               >
                 <.icon name="hero-user-plus" class="mr-4 size-6 shrink-0 text-primary-200" /> Users
               </.link>
+            <% end %>
+            <%= if @current_scope.user.is_super_user? or organisation_creator?(@current_scope.user)  do %>
               <.link
                 navigate={~p"/organisations"}
                 class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
@@ -174,18 +179,19 @@ defmodule OrganizationManagementSystemWeb.Layouts do
                 <.icon name="hero-building-office" class="mr-4 size-6 shrink-0 text-primary-200" />
                 Organisations
               </.link>
-            <% else %>
-              <.link
-                navigate={~p"/dashboard"}
-                aria-current="page"
-                class={[
-                  "group flex items-center rounded-md px-2 py-2 text-sm font-medium",
-                  "bg-primary-800 text-white"
-                ]}
-              >
-                <.icon name="hero-home" class="mr-4 size-6 shrink-0 text-primary-200" /> Dashboard
-              </.link>
             <% end %>
+
+            <.link
+              navigate={~p"/dashboard"}
+              aria-current="page"
+              class={[
+                "group flex items-center rounded-md px-2 py-2 text-sm font-medium",
+                "bg-primary-800 text-white"
+              ]}
+            >
+              <.icon name="hero-home" class="mr-4 size-6 shrink-0 text-primary-200" /> Dashboard
+            </.link>
+
             <.link
               navigate={~p"/users/settings"}
               class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
@@ -208,4 +214,8 @@ defmodule OrganizationManagementSystemWeb.Layouts do
     </aside>
     """
   end
+
+  defp organisation_creator?(current_user), do: Abilities.can_create_organisation?(current_user)
+
+  def can_review_or_approve?(current_user), do: Abilities.can_review_or_approve?(current_user)
 end

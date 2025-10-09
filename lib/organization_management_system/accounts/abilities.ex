@@ -25,6 +25,18 @@ defmodule OrganizationManagementSystem.Accounts.Abilities do
   end
 
   def can_review_or_approve?(current_user) do
-    current_user.id |> Accounts.get_global_roles_by_user_id() |> Enum.empty?() |> Kernel.!()
+    current_user.id
+    |> Accounts.get_global_roles_by_user_id_and_role_names(["user_reviewer", "user_approver"])
+    |> Enum.empty?()
+    |> Kernel.!()
+  end
+
+  def can_create_organisation?(%{is_super_user?: true}), do: true
+
+  def can_create_organisation?(current_user) do
+    current_user.id
+    |> Accounts.get_global_roles_by_user_id_and_role_names(["organisation create"])
+    |> Enum.empty?()
+    |> Kernel.!()
   end
 end
