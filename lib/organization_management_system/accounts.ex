@@ -15,6 +15,8 @@ defmodule OrganizationManagementSystem.Accounts do
   alias OrganizationManagementSystem.Accounts.Scope
   alias OrganizationManagementSystem.Accounts.Permission
 
+  @roles_who_review_and_approve_user ["user_reviewer", "user_approver"]
+
   ## Database getters
 
   @doc """
@@ -422,7 +424,7 @@ defmodule OrganizationManagementSystem.Accounts do
   end
 
   def list_users(%{user: user}) do
-    case get_global_roles_by_user_id(user.id) do
+    case get_global_roles_by_user_id_and_role_names(user.id, @roles_who_review_and_approve_user) do
       [%{name: "user_approver"}] ->
         Repo.all_by(User, status: :reviewed)
 
@@ -446,7 +448,7 @@ defmodule OrganizationManagementSystem.Accounts do
     [%Role{}, ...]
   """
 
-  def get_global_roles_by_user_id(user_id) do
+  def get_global_roles_by_user_id_and_role_names(user_id, role_names) do
     query =
       from(r in Role,
         join: rp in RolePermission,
@@ -455,7 +457,7 @@ defmodule OrganizationManagementSystem.Accounts do
         on: up.permission_id == rp.permission_id,
         where:
           up.user_id == ^user_id and r.scope == :all and
-            r.name in ["user_reviewer", "user_approver"],
+            r.name in ^role_names,
         select: r
       )
 

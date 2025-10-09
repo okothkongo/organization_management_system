@@ -57,21 +57,7 @@ Repo.insert!(%RolePermission{
   permission_id: Repo.get_by!(Permission, action: "review user").id
 })
 
-# Enum.each(1..10, fn i ->
-#   Repo.insert!(%User{
-#     email: "user#{i}@example.com",
-#     name: "User #{i}",
-#     status: :approved,
-#     is_super_user?: false
-#   })
-# end)
-
-# alias OrganizationManagementSystem.Organizations.Organization
-
-# Enum.each(1..3, fn i ->
-#   Repo.insert!(%Organization{
-#     name: "Organization #{i}",
-#     description: "Seeded organization #{i}",
-#     created_by_id: super_user.id
-#   })
-# end)
+Repo.insert!(%Permission{
+  action: "organisation_creator",
+  description: "can create organisation"
+})

@@ -8,7 +8,7 @@ defmodule OrganizationManagementSystemWeb.OrganizationLiveTest do
 
   @invalid_attrs %{name: nil}
 
-  setup :register_and_log_in_user
+  setup :register_and_log_in_super_user
 
   defp create_organization(%{scope: scope}) do
     organization = organization_fixture(scope)
