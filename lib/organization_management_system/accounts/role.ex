@@ -16,6 +16,7 @@ defmodule OrganizationManagementSystem.Accounts.Role do
     field :system?, :boolean, default: false
     field :permission_id, :id, virtual: true
     belongs_to :created_by, User, foreign_key: :created_by_id
+    belongs_to :organisation, OrganizationManagementSystem.Organizations.Organization, foreign_key: :organisation_id
     many_to_many :permissions, Permission, join_through: RolePermission
 
     timestamps(type: :utc_datetime)
