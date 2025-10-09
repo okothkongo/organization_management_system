@@ -12,8 +12,6 @@
 alias OrganizationManagementSystem.Repo
 alias OrganizationManagementSystem.Accounts.User
 alias OrganizationManagementSystem.Accounts.Permission
-alias OrganizationManagementSystem.Accounts.Role
-alias OrganizationManagementSystem.Accounts.RolePermission
 
 super_user =
   Repo.insert!(%User{
@@ -24,40 +22,31 @@ super_user =
   })
 
 Repo.insert!(%Permission{
-  action: "review user",
-  description: "can review user"
+  action: "org:create",
+  description: "Can  create organistaton"
 })
 
 Repo.insert!(%Permission{
-  action: "approve user",
-  description: "Can reviewed approve user"
-})
-
-Repo.insert!(%Role{
-  name: "user_approver",
-  description: "Role for approving users",
-  created_by_id: super_user.id,
-  scope: :all
-})
-
-Repo.insert!(%Role{
-  name: "user_reviewer",
-  description: "Role for reviewing users",
-  created_by_id: super_user.id,
-  scope: :all
-})
-
-Repo.insert!(%RolePermission{
-  role_id: Repo.get_by!(Role, name: "user_approver").id,
-  permission_id: Repo.get_by!(Permission, action: "approve user").id
-})
-
-Repo.insert!(%RolePermission{
-  role_id: Repo.get_by!(Role, name: "user_reviewer").id,
-  permission_id: Repo.get_by!(Permission, action: "review user").id
+  action: "org:edit",
+  description: "Can  edit organistaton"
 })
 
 Repo.insert!(%Permission{
-  action: "organisation_creator",
-  description: "can create organisation"
+  action: "org:member:add",
+  description: "Can  add organistaton member"
+})
+
+Repo.insert!(%Permission{
+  action: "org:member:grant_role",
+  description: "Can  grant role to organistaton members"
+})
+
+Repo.insert!(%Permission{
+  action: "review:stage:invited",
+  description: "Can review invited users"
+})
+
+Repo.insert!(%Permission{
+  action: "review:stage:reviewed",
+  description: "Can approve reviewed users"
 })
