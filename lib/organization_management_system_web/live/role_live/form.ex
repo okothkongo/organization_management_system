@@ -3,6 +3,7 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
 
   alias OrganizationManagementSystem.Accounts
   alias OrganizationManagementSystem.Accounts.Role
+  alias OrganizationManagementSystem.Organizations
 
   @impl true
   def render(assigns) do
@@ -26,6 +27,12 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
           type="select"
           label="Permission"
           options={[{"Select Permision", ""}] ++ list_permission_options()}
+        />
+        <.input
+          field={@form[:organisation_id]}
+          type="select"
+          label="Organisation"
+          options={[{"Select Organisation", ""}] ++ list_organisation_options()}
         />
         <.input field={@form[:description]} type="text" label="Description" />
         <.input field={@form[:system?]} type="checkbox" label="System?" />
@@ -98,5 +105,9 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
 
   defp list_role_scope_options do
     Role |> Ecto.Enum.values(:scope) |> Enum.map(&{Phoenix.Naming.humanize(&1), &1})
+  end
+
+  defp list_organisation_options do
+    Organizations.list_organisations() |> Enum.map(&{&1.name, &1.id})
   end
 end
