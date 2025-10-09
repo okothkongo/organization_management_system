@@ -38,10 +38,11 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Form do
 
   @impl true
   def mount(params, _session, socket) do
+    org_id = String.to_integer(params["org_id"])
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
-     |> assign(:org_id, params["org_id"])
+     |> assign(:org_id, org_id)
      |> apply_action(socket.assigns.live_action, params)}
   end
 
