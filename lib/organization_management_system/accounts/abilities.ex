@@ -19,6 +19,7 @@ defmodule OrganizationManagementSystem.Accounts.Abilities do
   @approve_user_permission "review:stage:reviewed"
   @review_user_permission "review:stage:invited"
   @create_organisation_permission "org:create"
+  @add_org_member "org:member:add"
 
 
   def can_create_role?(current_user) do
@@ -44,6 +45,10 @@ defmodule OrganizationManagementSystem.Accounts.Abilities do
 
   def can_review_user?(user) do
     user.is_super_user? or @review_user_permission in get_permissions_actions(user.id)
+  end
+
+  def can_add_org_member?(user) do
+    user.is_super_user? or @add_org_member in get_permissions_actions(user.id)
   end
 
   defp get_permissions_actions(user_id) do

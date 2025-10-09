@@ -23,7 +23,7 @@ super_user =
 
 Repo.insert!(%Permission{
   action: "org:create",
-  description: "Can  create organistaton"
+  description: "Can  create and other operations on org"
 })
 
 Repo.insert!(%Permission{
