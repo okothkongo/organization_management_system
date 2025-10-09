@@ -65,6 +65,10 @@ defmodule OrganizationManagementSystemWeb.Router do
       live "/roles/new", RoleLive.Form, :new
       live "/roles/:id", RoleLive.Show, :show
       live "/users/register", UserLive.Registration, :new
+    end
+
+    live_session :require_authenticated_reviewer,
+      on_mount: [{OrganizationManagementSystemWeb.UserAuth, :require_authenticated_reviewer}] do
       live "/users", UserLive.Index, :index
     end
   end

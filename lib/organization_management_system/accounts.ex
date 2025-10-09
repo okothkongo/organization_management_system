@@ -417,8 +417,49 @@ defmodule OrganizationManagementSystem.Accounts do
     |> Repo.insert()
   end
 
-  def list_users do
+  def list_users(%{user: %{is_super_user?: true}} = _scope) do
     Repo.all(User)
+  end
+
+  def list_users(%{user: user}) do
+    case get_global_roles_by_user_id(user.id) do
+      [%{name: "user_approver"}] ->
+        Repo.all_by(User, status: :reviewed)
+
+      [%{name: "user_reviewer"}] ->
+        Repo.all_by(User, status: :invited)
+
+      _ ->
+        []
+    end
+  end
+
+  @doc """
+  Returns the list of roles for a given user_id.
+
+  This function joins the user_permissions and role_permissions tables
+  to find all roles assigned to the user, either directly or via permissions.
+
+  ## Examples
+
+    iex> get_global_roles_by_user_id(1)
+    [%Role{}, ...]
+  """
+
+  def get_global_roles_by_user_id(user_id) do
+    query =
+      from(r in Role,
+        join: rp in RolePermission,
+        on: rp.role_id == r.id,
+        join: up in UserPermission,
+        on: up.permission_id == rp.permission_id,
+        where:
+          up.user_id == ^user_id and r.scope == :all and
+            r.name in ["user_reviewer", "user_approver"],
+        select: r
+      )
+
+    Repo.all(query)
   end
 
   def get_permission_by_action!(action) do

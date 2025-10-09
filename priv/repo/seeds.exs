@@ -37,7 +37,7 @@ Repo.insert!(%Role{
   name: "user_approver",
   description: "Role for approving users",
   created_by_id: super_user.id,
-  scope: all
+  scope: :all
 })
 
 Repo.insert!(%Role{

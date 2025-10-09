@@ -8,11 +8,13 @@ defmodule OrganizationManagementSystemWeb.UserLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Listing Roles
+        Listing Users
         <:actions>
-          <.button variant="primary" navigate={~p"/users/register"}>
-            <.icon name="hero-plus" /> Invite User
-          </.button>
+          <%= if @current_scope.user.is_super_user? do %>
+            <.button variant="primary" navigate={~p"/users/register"}>
+              <.icon name="hero-plus" /> Invite User
+            </.button>
+          <% end %>
         </:actions>
       </.header>
 
@@ -54,10 +56,12 @@ defmodule OrganizationManagementSystemWeb.UserLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    scope = socket.assigns.current_scope
+
     {:ok,
      socket
      |> assign(:page_title, "List Users")
-     |> stream(:users, Accounts.list_users())}
+     |> stream(:users, Accounts.list_users(scope))}
   end
 
   @impl true

@@ -17,6 +17,7 @@ defmodule OrganizationManagementSystemWeb.UserAuth do
   import Plug.Conn
   import Phoenix.Controller
 
+  alias OrganizationManagementSystem.Accounts.Abilities
   alias OrganizationManagementSystem.Accounts
   alias OrganizationManagementSystem.Accounts.Scope
 
@@ -267,6 +268,29 @@ defmodule OrganizationManagementSystemWeb.UserAuth do
         |> then(&{:halt, &1})
 
       !current_user.is_super_user? ->
+        socket
+        |> Phoenix.LiveView.put_flash(:error, "You are not authorized to access this page.")
+        |> Phoenix.LiveView.redirect(to: ~p"/dashboard")
+        |> then(&{:halt, &1})
+
+      true ->
+        {:cont, socket}
+    end
+  end
+
+  def on_mount(:require_authenticated_reviewer, _params, session, socket) do
+    socket = mount_current_scope(socket, session)
+
+    current_user = socket.assigns[:current_scope] && socket.assigns.current_scope.user
+
+    cond do
+      is_nil(current_user) ->
+        socket
+        |> Phoenix.LiveView.put_flash(:error, "You must log in to access this page.")
+        |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
+        |> then(&{:halt, &1})
+
+      !Abilities.can_review_or_approve?(current_user) ->
         socket
         |> Phoenix.LiveView.put_flash(:error, "You are not authorized to access this page.")
         |> Phoenix.LiveView.redirect(to: ~p"/dashboard")

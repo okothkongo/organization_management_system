@@ -495,8 +495,9 @@ defmodule OrganizationManagementSystem.AccountsTest do
   end
 
   test "list_user/0" do
-    user = Factory.insert!(:user)
-    users = Accounts.list_users()
+    scope = super_user_scope_fixture()
+    user = user_fixture()
+    users = Accounts.list_users(scope)
     assert user in users
   end
 
@@ -506,6 +507,53 @@ defmodule OrganizationManagementSystem.AccountsTest do
       user = Factory.insert!(:user)
       permission = Factory.insert!(:permission)
       Accounts.create_user_permission(%{user_id: user.id, permission_id: permission.id}, scope)
+    end
+  end
+
+  describe "get_global_roles_by_user_id/1" do
+    test "returns an empty list if user has no global roles" do
+      user = Factory.insert!(:user)
+      assert Accounts.get_global_roles_by_user_id(user.id) == []
+    end
+
+    test "returns global roles assigned to the user" do
+      user = Factory.insert!(:user)
+      global_role = Factory.insert!(:role, scope: :all)
+
+      permission = Factory.insert!(:permission, action: "some_action_#{System.unique_integer()}")
+      Factory.insert!(:role_permission, role: global_role, permission: permission)
+      Factory.insert!(:user_permission, user: user, permission: permission)
+      roles = Accounts.get_global_roles_by_user_id(user.id)
+      assert Enum.any?(roles, fn role -> role.id == global_role.id end)
+    end
+
+    test "does not return non-global roles" do
+      user = Factory.insert!(:user)
+      permission = Factory.insert!(:permission, action: "some_action_#{System.unique_integer()}")
+      non_global_role = Factory.insert!(:role, scope: :organisation)
+      Factory.insert!(:user_permission, user: user, permission: permission)
+      Factory.insert!(:role_permission, role: non_global_role, permission: permission)
+      assert Accounts.get_global_roles_by_user_id(user.id) == []
+    end
+
+    test "returns only global roles when user has both global and non-global roles" do
+      user = Factory.insert!(:user)
+      global_role = Factory.insert!(:role, scope: :all)
+      non_global_role = Factory.insert!(:role, scope: :organisation)
+      permission = Factory.insert!(:permission, action: "some_action_#{System.unique_integer()}")
+      permission2 = Factory.insert!(:permission, action: "some_action_#{System.unique_integer()}")
+      Factory.insert!(:role_permission, role: global_role, permission: permission)
+      Factory.insert!(:user_permission, user: user, permission: permission)
+      Factory.insert!(:role_permission, role: non_global_role, permission: permission2)
+      Factory.insert!(:user_permission, user: user, permission: permission2)
+
+      roles = Accounts.get_global_roles_by_user_id(user.id)
+      assert Enum.any?(roles, fn role -> role.id == global_role.id end)
+      refute Enum.any?(roles, fn role -> role.id == non_global_role.id end)
+    end
+
+    test "raises if user does not exist" do
+      assert Accounts.get_global_roles_by_user_id(-1) == []
     end
   end
 end

@@ -14,7 +14,17 @@ defmodule OrganizationManagementSystem.Accounts.Abilities do
   fine-grained access control throughout the application.
   """
 
+  alias OrganizationManagementSystem.Accounts
+
   def can_create_role?(current_user) do
     current_user.is_super_user?
+  end
+
+  def can_review_or_approve?(%{is_super_user?: true}) do
+    true
+  end
+
+  def can_review_or_approve?(current_user) do
+    current_user.id |> Accounts.get_global_roles_by_user_id() |> Enum.empty?() |> Kernel.!()
   end
 end

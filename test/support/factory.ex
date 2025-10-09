@@ -70,6 +70,14 @@ defmodule OrganizationManagementSystem.Factory do
     }
   end
 
+  def build(:user_permission) do
+    %OrganizationManagementSystem.Accounts.UserPermission{
+      user: build(:user),
+      permission: build(:permission),
+      granted_by: build(:super_user)
+    }
+  end
+
   # Convenience API
 
   def build(factory_name, attributes) do
