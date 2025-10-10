@@ -26,10 +26,7 @@ Repo.insert!(%Permission{
   description: "Can  create and other operations on org"
 })
 
-Repo.insert!(%Permission{
-  action: "org:edit",
-  description: "Can  edit organistaton"
-})
+
 
 Repo.insert!(%Permission{
   action: "org:member:add",
