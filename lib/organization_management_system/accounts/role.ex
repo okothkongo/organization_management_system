@@ -28,8 +28,8 @@ defmodule OrganizationManagementSystem.Accounts.Role do
   @doc false
   def changeset(role, attrs, scope) do
     role
-    |> cast(attrs, [:name, :scope, :description,  :permission_id, :organisation_id])
-    |> validate_required([:name, :scope, :description,  :permission_id])
+    |> cast(attrs, [:name, :scope, :description, :permission_id, :organisation_id])
+    |> validate_required([:name, :scope, :description, :permission_id])
     |> put_change(:created_by_id, scope.user.id)
     |> validate_organisation()
   end

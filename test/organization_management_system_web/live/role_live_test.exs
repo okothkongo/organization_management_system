@@ -11,7 +11,7 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
     description: "some description"
   }
 
-  @invalid_attrs %{name: nil, scope: nil, description: nil,}
+  @invalid_attrs %{name: nil, scope: nil, description: nil}
 
   describe "super user" do
     setup :register_and_log_in_super_user

@@ -78,12 +78,8 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
   end
 
   defp save_role(socket, :new, role_params) do
-    permission_id = role_params["permission_id"]
-
     case Accounts.create_role(socket.assigns.current_scope, role_params) do
       {:ok, role} ->
-        Accounts.create_role_permission(%{role_id: role.id, permission_id: permission_id})
-
         {:noreply,
          socket
          |> put_flash(:info, "Role created successfully")

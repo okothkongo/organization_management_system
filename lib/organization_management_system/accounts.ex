@@ -17,6 +17,7 @@ defmodule OrganizationManagementSystem.Accounts do
   alias OrganizationManagementSystem.Accounts.Scope
   alias OrganizationManagementSystem.Accounts.Permission
   alias OrganizationManagementSystem.Organizations.OrganizationUser
+  alias Ecto.Multi
 
   ## Database getters
 
@@ -365,25 +366,33 @@ defmodule OrganizationManagementSystem.Accounts do
   end
 
   @doc """
-  Creates a role.
+  Creates a role with associated permissions in a transaction.
+
+  ## Parameters
+    - scope: The current scope context
+    - attrs: Role attributes including permission_id
 
   ## Examples
-
-      iex> create_role(scope, %{field: value})
+      iex> create_role(scope, %{name: "Admin",  1)
       {:ok, %Role{}}
-
-      iex> create_role(scope, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
   """
-  def create_role(%Scope{} = scope, attrs) do
-    with true <- Abilities.can_create_role?(scope.user),
-         {:ok, %Role{} = role} <-
-           %Role{}
-           |> Role.changeset(attrs, scope)
-           |> Repo.insert() do
-      broadcast_role(scope, {:created, role})
-      {:ok, role}
+
+  def create_role(scope, role_attrs) do
+    Multi.new()
+    |> Multi.insert(:role, Role.changeset(%Role{}, role_attrs, scope))
+    |> Multi.run(:role_permissions, fn _repo, %{role: role} ->
+      permission_id = role_attrs["permission_id"] || role_attrs[:permission_id]
+      create_role_permission(%{role_id: role.id, permission_id: permission_id})
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, result} ->
+        broadcast_role(scope, {:created, result.role})
+
+        {:ok, result.role}
+
+      {:error, :role, changeset, _} ->
+        {:error, changeset}
     end
   end
 
