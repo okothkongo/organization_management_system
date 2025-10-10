@@ -144,6 +144,41 @@ defmodule OrganizationManagementSystem.Organizations do
     Repo.exists?(query)
   end
 
+  @doc """
+  Checks if a user has a role assigned in an organization.
+  Returns true only if user is in org AND has a non-nil role_id.
+
+  ## Examples
+      iex> user_has_role_in_org?(1, 5)
+      true
+
+      iex> user_has_role_in_org?(2, 5)
+      false
+  """
+  def user_has_role_in_org?(user_id, org_id) do
+    query =
+      from ou in OrganizationUser,
+        where:
+          ou.user_id == ^user_id and
+            ou.organisation_id == ^org_id and
+            not is_nil(ou.role_id)
+
+    Repo.exists?(query)
+  end
+
+  def get_organization_user(user_id, org_id) do
+    Repo.get_by(OrganizationUser, user_id: user_id, organisation_id: org_id)
+  end
+
+  def organization_member_has_organization_role?(user_id, org_id) do
+    query =
+      from(up in OrganizationUser,
+        where: up.user_id == ^user_id and up.organisation_id == ^org_id and not is_nil(up.role_id)
+      )
+
+    Repo.exists?(query)
+  end
+
   defp maybe_filter_by_user(query, user) do
     if Abilities.can_create_organisation?(user) do
       query
