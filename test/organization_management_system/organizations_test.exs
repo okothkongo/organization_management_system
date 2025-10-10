@@ -42,5 +42,44 @@ defmodule OrganizationManagementSystem.OrganizationsTest do
       organization = organization_fixture(scope)
       assert %Ecto.Changeset{} = Organizations.change_organization(scope, organization)
     end
+
+    test "list_user_organisations/1 returns all organisations where user is member" do
+      user = Factory.insert!(:user)
+      org = Factory.insert!(:organization)
+      org2 = Factory.insert!(:organization)
+      org3 = Factory.insert!(:organization)
+      role = Factory.insert!(:role, scope: :organisation, name: "member")
+
+      Factory.insert!(:organization_user,
+        user: user,
+        organisation: org,
+        role: role
+      )
+
+      Factory.insert!(:organization_user,
+        user: user,
+        organisation: org2,
+        role: role
+      )
+
+      assert user_orgs = Organizations.list_user_organisations(user)
+      assert length(user_orgs) == 2
+      assert Enum.any?(user_orgs, fn o -> o.id == org.id end)
+      assert Enum.any?(user_orgs, fn o -> o.id == org2.id end)
+      refute Enum.any?(user_orgs, fn o -> o.id == org3.id end)
+    end
+
+    test "list_user_organisations/1 returns all organisations for super user" do
+      user = Factory.insert!(:super_user)
+      org = Factory.insert!(:organization)
+      org2 = Factory.insert!(:organization)
+      org3 = Factory.insert!(:organization)
+
+      assert user_orgs = Organizations.list_user_organisations(user)
+      assert length(user_orgs) >= 3
+      assert Enum.any?(user_orgs, fn o -> o.id == org.id end)
+      assert Enum.any?(user_orgs, fn o -> o.id == org2.id end)
+      assert Enum.any?(user_orgs, fn o -> o.id == org3.id end)
+    end
   end
 end

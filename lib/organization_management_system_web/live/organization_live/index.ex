@@ -39,6 +39,8 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    current_user = socket.assigns.current_scope.user
+
     if connected?(socket) do
       Organizations.subscribe_organisations(socket.assigns.current_scope)
     end
@@ -46,13 +48,14 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
     {:ok,
      socket
      |> assign(:page_title, "Listing Organisations")
-     |> stream(:organisations, list_organisations())}
+     |> stream(:organisations, list_user_organisations(current_user))}
   end
 
   @impl true
   def handle_info({type, %OrganizationManagementSystem.Organizations.Organization{}}, socket)
       when type in [:created] do
-    {:noreply, stream(socket, :organisations, list_organisations(), reset: true)}
+    current_user = socket.assigns.current_scope.user
+    {:noreply, stream(socket, :organisations, list_user_organisations(current_user), reset: true)}
   end
 
   @impl true
@@ -60,7 +63,7 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
     {:noreply, push_navigate(socket, to: ~p"/organisations/members?org_id=#{org_id}")}
   end
 
-  defp list_organisations do
-    Organizations.list_organisations()
+  defp list_user_organisations(user) do
+    Organizations.list_user_organisations(user)
   end
 end
