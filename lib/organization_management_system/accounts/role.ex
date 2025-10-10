@@ -34,10 +34,23 @@ defmodule OrganizationManagementSystem.Accounts.Role do
     |> validate_organisation()
   end
 
-  def validate_organisation(
-        %Ecto.Changeset{changes: %{scope: :all, organisation_id: _id}} = changeset
-      ) do
-    add_error(changeset, :organisation_id, "Only organisation scope role require organisation")
+  def validate_organisation(%Ecto.Changeset{changes: %{scope: scope}} = changeset) do
+    org_id = get_change(changeset, :organisation_id)
+
+    case scope do
+      :organisation when is_nil(org_id) ->
+        add_error(
+          changeset,
+          :organisation_id,
+          "Organisation must be present for organisation scoped roles"
+        )
+
+      :all when not is_nil(org_id) ->
+        add_error(changeset, :organisation_id, "Organisation is not allowed for all scoped roles")
+
+      _ ->
+        changeset
+    end
   end
 
   def validate_organisation(changeset), do: changeset

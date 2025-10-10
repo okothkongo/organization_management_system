@@ -180,8 +180,6 @@ defmodule OrganizationManagementSystemWeb.Layouts do
               Organisations
             </.link>
 
-
-
             <.link
               navigate={~p"/users/settings"}
               class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
