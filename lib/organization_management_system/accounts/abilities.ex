@@ -21,6 +21,7 @@ defmodule OrganizationManagementSystem.Accounts.Abilities do
   @review_user_permission "review:stage:invited"
   @create_organisation_permission "org:create"
   @add_org_member "org:member:add"
+  @grant_org_role "org:member:grant_role"
 
   def can_create_role?(current_user) do
     current_user.is_super_user?
@@ -53,6 +54,14 @@ defmodule OrganizationManagementSystem.Accounts.Abilities do
         @add_org_member in get_permissions_actions(user.id)
 
     user.is_super_user? or is_member_allowed_to_add
+  end
+
+  def can_grant_role?(user, org_id) do
+    cant_grant_role =
+      Organizations.member_of_org?(user.id, org_id) and
+        @grant_org_role in get_permissions_actions(user.id)
+
+    cant_grant_role or user.is_super_user?
   end
 
   defp get_permissions_actions(user_id) do

@@ -64,9 +64,8 @@ defmodule OrganizationManagementSystemWeb.UserLive.RegistrationTest do
       {:ok, lv, _html} = live(conn, ~p"/users/register")
 
       email = unique_user_email()
-      attrs = valid_user_attributes(email: email)
-      valid_user_attributes = Map.put(attrs, :role_id, role.id)
-      form = form(lv, "#registration_form", user: valid_user_attributes)
+
+      form = form(lv, "#registration_form", user: valid_user_attributes(email: email))
 
       {:ok, _lv, html} =
         form
