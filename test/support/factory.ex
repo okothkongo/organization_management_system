@@ -89,7 +89,6 @@ defmodule OrganizationManagementSystem.Factory do
     %OrganizationManagementSystem.Organizations.OrganizationUser{
       organisation: build(:organization),
       user: build(:user),
-      role: build(:role),
       invited_by: build(:super_user)
     }
   end

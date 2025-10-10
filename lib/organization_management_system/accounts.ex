@@ -17,6 +17,7 @@ defmodule OrganizationManagementSystem.Accounts do
   alias OrganizationManagementSystem.Accounts.Scope
   alias OrganizationManagementSystem.Accounts.Permission
   alias OrganizationManagementSystem.Organizations.OrganizationUser
+  alias OrganizationManagementSystem.Accounts.UserRole
   alias Ecto.Multi
 
   ## Database getters
@@ -511,16 +512,17 @@ defmodule OrganizationManagementSystem.Accounts do
   Assigns a user to a role within an organization.
   Returns {:ok, org_user} if successful or user already has the role.
   """
-  def assign_member_to_role(user_id, role_id, org_id, scope) do
-    case Organizations.get_organization_user(user_id, org_id) do
-      %OrganizationUser{role_id: ^role_id} ->
-        {:error, :user_already_has_role}
+  def create_user_role(user_id, role_id, org_id \\ nil) do
+    role_scope = if org_id, do: :organisation, else: :all
 
-      org_user ->
-        org_user
-        |> OrganizationUser.changeset(%{role_id: role_id}, scope)
-        |> Repo.update()
-    end
+    %UserRole{}
+    |> UserRole.changeset(%{
+      user_id: user_id,
+      role_id: role_id,
+      scope: role_scope,
+      organisation_id: org_id
+    })
+    |> Repo.insert()
   end
 
   @doc """

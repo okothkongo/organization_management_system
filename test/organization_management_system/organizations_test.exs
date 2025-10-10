@@ -52,14 +52,12 @@ defmodule OrganizationManagementSystem.OrganizationsTest do
 
       Factory.insert!(:organization_user,
         user: user,
-        organisation: org,
-        role: role
+        organisation: org
       )
 
       Factory.insert!(:organization_user,
         user: user,
-        organisation: org2,
-        role: role
+        organisation: org2
       )
 
       assert user_orgs = Organizations.list_user_organisations(user)
@@ -88,8 +86,7 @@ defmodule OrganizationManagementSystem.OrganizationsTest do
 
       Factory.insert!(:organization_user,
         user: user,
-        organisation: org,
-        role: Factory.insert!(:role, scope: :organisation, name: "member")
+        organisation: org
       )
 
       assert Organizations.member_of_org?(user.id, org.id) == true
@@ -108,8 +105,7 @@ defmodule OrganizationManagementSystem.OrganizationsTest do
 
       Factory.insert!(:organization_user,
         user: user,
-        organisation: org,
-        role: Factory.insert!(:role, scope: :organisation, name: "member")
+        organisation: org
       )
 
       assert Organizations.user_has_role_in_org?(user.id, org.id) == true
@@ -121,8 +117,7 @@ defmodule OrganizationManagementSystem.OrganizationsTest do
 
       Factory.insert!(:organization_user,
         user: user,
-        organisation: org,
-        role: nil
+        organisation: org
       )
 
       assert Organizations.user_has_role_in_org?(user.id, org.id) == false
@@ -143,14 +138,12 @@ defmodule OrganizationManagementSystem.OrganizationsTest do
 
       Factory.insert!(:organization_user,
         user: user1,
-        organisation: org,
-        role: Factory.insert!(:role, scope: :organisation, name: "member")
+        organisation: org
       )
 
       Factory.insert!(:organization_user,
         user: user2,
-        organisation: org,
-        role: Factory.insert!(:role, scope: :organisation, name: "member1")
+        organisation: org
       )
 
       assert members = Organizations.list_organization_members(org.id)

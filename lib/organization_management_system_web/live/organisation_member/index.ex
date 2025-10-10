@@ -55,12 +55,11 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Index do
 
   @impl true
   def handle_event("grant_role", params, socket) do
-    scope = socket.assigns.current_scope
     org_id = socket.assigns.org_id
     user_id = params["id"]
     role_id = params["role_id"]
 
-    case Accounts.assign_member_to_role(user_id, role_id, org_id, scope) do
+    case Accounts.create_user_role(user_id, role_id, org_id) do
       {:ok, _} ->
         {:noreply,
          socket
