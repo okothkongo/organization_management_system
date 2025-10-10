@@ -81,5 +81,104 @@ defmodule OrganizationManagementSystem.OrganizationsTest do
       assert Enum.any?(user_orgs, fn o -> o.id == org2.id end)
       assert Enum.any?(user_orgs, fn o -> o.id == org3.id end)
     end
+
+    test "member_of_org?/2 returns true if user is member of the org" do
+      user = Factory.insert!(:user)
+      org = Factory.insert!(:organization)
+
+      Factory.insert!(:organization_user,
+        user: user,
+        organisation: org,
+        role: Factory.insert!(:role, scope: :organisation, name: "member")
+      )
+
+      assert Organizations.member_of_org?(user.id, org.id) == true
+    end
+
+    test "member_of_org?/2 returns false if user is not member of the org" do
+      user = Factory.insert!(:user)
+      org = Factory.insert!(:organization)
+
+      assert Organizations.member_of_org?(user.id, org.id) == false
+    end
+
+    test "user_has_role_in_org?/2 returns true if user has a role in the org" do
+      user = Factory.insert!(:user)
+      org = Factory.insert!(:organization)
+
+      Factory.insert!(:organization_user,
+        user: user,
+        organisation: org,
+        role: Factory.insert!(:role, scope: :organisation, name: "member")
+      )
+
+      assert Organizations.user_has_role_in_org?(user.id, org.id) == true
+    end
+
+    test "user_has_role_in_org?/2 returns false if user has no role in the org" do
+      user = Factory.insert!(:user)
+      org = Factory.insert!(:organization)
+
+      Factory.insert!(:organization_user,
+        user: user,
+        organisation: org,
+        role: nil
+      )
+
+      assert Organizations.user_has_role_in_org?(user.id, org.id) == false
+    end
+
+    test "user_has_role_in_org?/2 returns false if user is not member of the org" do
+      user = Factory.insert!(:user)
+      org = Factory.insert!(:organization)
+
+      assert Organizations.user_has_role_in_org?(user.id, org.id) == false
+    end
+
+    test "list_organization_members/1 returns all members of the org" do
+      user1 = Factory.insert!(:user)
+      user2 = Factory.insert!(:user)
+      user3 = Factory.insert!(:user)
+      org = Factory.insert!(:organization)
+
+      Factory.insert!(:organization_user,
+        user: user1,
+        organisation: org,
+        role: Factory.insert!(:role, scope: :organisation, name: "member")
+      )
+
+      Factory.insert!(:organization_user,
+        user: user2,
+        organisation: org,
+        role: Factory.insert!(:role, scope: :organisation, name: "member1")
+      )
+
+      assert members = Organizations.list_organization_members(org.id)
+      assert length(members) == 2
+      assert Enum.any?(members, fn m -> m.id == user1.id end)
+      assert Enum.any?(members, fn m -> m.id == user2.id end)
+      refute Enum.any?(members, fn m -> m.id == user3.id end)
+    end
+
+    test "list_organization_members/1 returns empty list if org does not exist" do
+      assert [] = Organizations.list_organization_members(-1)
+    end
+
+    test "list_roles_by_organization/1 returns all roles of the org" do
+      org = Factory.insert!(:organization)
+      role1 = Factory.insert!(:role, scope: :organisation, organisation: org)
+      role2 = Factory.insert!(:role, scope: :organisation, organisation: org)
+      _role3 = Factory.insert!(:role, scope: :all)
+
+      assert roles = Organizations.list_roles_by_organization(org.id)
+      assert length(roles) == 2
+      assert Enum.any?(roles, fn r -> r.id == role1.id end)
+      assert Enum.any?(roles, fn r -> r.id == role2.id end)
+    end
+
+    test "list_roles_by_organization/1 returns empty list if org has no roles" do
+      org = Factory.insert!(:organization)
+      assert [] = Organizations.list_roles_by_organization(org.id)
+    end
   end
 end

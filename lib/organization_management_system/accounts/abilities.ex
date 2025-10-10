@@ -19,7 +19,7 @@ defmodule OrganizationManagementSystem.Accounts.Abilities do
 
   @approve_user_permission "review:stage:reviewed"
   @review_user_permission "review:stage:invited"
-  @create_organisation_permission "org:create"
+  @priviledged_permission "priviledged:access"
   @add_org_member "org:member:add"
   @grant_org_role "org:member:grant_role"
 
@@ -35,8 +35,8 @@ defmodule OrganizationManagementSystem.Accounts.Abilities do
     can_approve_user?(current_user) or can_review_user?(current_user)
   end
 
-  def can_create_organisation?(user) do
-    user.is_super_user? or @create_organisation_permission in get_permissions_actions(user.id)
+  def has_priviledged_acces?(user) do
+    user.is_super_user? or @priviledged_permission in get_permissions_actions(user.id)
   end
 
   def can_approve_user?(user) do
@@ -53,15 +53,17 @@ defmodule OrganizationManagementSystem.Accounts.Abilities do
       Organizations.member_of_org?(user.id, org_id) and
         @add_org_member in get_permissions_actions(user.id)
 
-    user.is_super_user? or is_member_allowed_to_add
+    user.is_super_user? or is_member_allowed_to_add or
+      @priviledged_permission in get_permissions_actions(user.id)
   end
 
   def can_grant_role?(user, org_id) do
-    cant_grant_role =
+    can_grant_role =
       Organizations.member_of_org?(user.id, org_id) and
         @grant_org_role in get_permissions_actions(user.id)
 
-    cant_grant_role or user.is_super_user?
+    can_grant_role or user.is_super_user? or
+      @priviledged_permission in get_permissions_actions(user.id)
   end
 
   defp get_permissions_actions(user_id) do

@@ -30,21 +30,22 @@ defmodule OrganizationManagementSystemWeb.OrganizationLiveTest do
   end
 
   describe "User with abilities" do
+    @priveldged_user_permission "priviledged:access"
     setup do
-      user_who_can_create_org = Factory.insert!(:user)
-      permission = Factory.insert!(:permission, action: "org:create")
+      priviledged = Factory.insert!(:user)
+      permission = Factory.insert!(:permission, action: @priveldged_user_permission)
       role = Factory.insert!(:role, scope: :organisation, name: "Creator")
 
       Factory.insert!(:role_permission, role: role, permission: permission)
-      Factory.insert!(:user_permission, user: user_who_can_create_org, permission: permission)
-      %{user_who_can_create_org: user_who_can_create_org}
+      Factory.insert!(:user_permission, user: priviledged, permission: permission)
+      %{priviledged: priviledged}
     end
 
-    test "to create organization", %{
+    test "privedlged user create organization", %{
       conn: conn,
-      user_who_can_create_org: user_who_can_create_org
+      priviledged: priviledged
     } do
-      conn = log_in_user(conn, user_who_can_create_org)
+      conn = log_in_user(conn, priviledged)
       {:ok, index_live, html} = live(conn, ~p"/organisations")
       assert html =~ "New Organization"
 
@@ -98,6 +99,59 @@ defmodule OrganizationManagementSystemWeb.OrganizationLiveTest do
 
       assert html =~ "Organization created successfully"
       assert html =~ "some name"
+    end
+
+    test "super user can edit organization", %{
+      conn: conn
+    } do
+      super_user = Factory.insert!(:super_user)
+      conn = log_in_user(conn, super_user)
+      organization = Factory.insert!(:organization)
+      {:ok, index_live, _html} = live(conn, ~p"/organisations")
+
+      assert {:ok, edit_form_live, _} =
+               index_live
+               |> element("a", "Edit")
+               |> render_click()
+               |> follow_redirect(conn, ~p"/organisations/#{organization.id}/edit")
+
+      assert render(edit_form_live) =~ "Edit Organization"
+
+      assert {:ok, _index_live, html} =
+               edit_form_live
+               |> form("#organization-form", organization: %{name: "updated name"})
+               |> render_submit()
+               |> follow_redirect(conn, ~p"/organisations")
+
+      assert html =~ "Organization updated successfully"
+      assert html =~ "updated name"
+    end
+
+    test "priviledged user can edit organization", %{
+      conn: conn,
+      priviledged: priviledged
+    } do
+      conn = log_in_user(conn, priviledged)
+
+      organization = Factory.insert!(:organization)
+      {:ok, index_live, _html} = live(conn, ~p"/organisations")
+
+      assert {:ok, edit_form_live, _} =
+               index_live
+               |> element("a", "Edit")
+               |> render_click()
+               |> follow_redirect(conn, ~p"/organisations/#{organization.id}/edit")
+
+      assert render(edit_form_live) =~ "Edit Organization"
+
+      assert {:ok, _index_live, html} =
+               edit_form_live
+               |> form("#organization-form", organization: %{name: "updated name"})
+               |> render_submit()
+               |> follow_redirect(conn, ~p"/organisations")
+
+      assert html =~ "Organization updated successfully"
+      assert html =~ "updated name"
     end
   end
 end
