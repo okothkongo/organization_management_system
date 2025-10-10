@@ -38,7 +38,8 @@ defmodule OrganizationManagementSystemWeb.UserLive.IndexTest do
 
       permission = Factory.insert!(:permission, action: "review:stage:invited")
       Factory.insert!(:role_permission, role: global_role, permission: permission)
-      Factory.insert!(:user_permission, user: reviewer, permission: permission)
+      Factory.insert!(:user_role, user: reviewer, role: global_role)
+
       conn = log_in_user(conn, reviewer)
       {:ok, view, html} = live(conn, ~p"/users")
       assert html =~ invited_user.name
@@ -62,7 +63,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.IndexTest do
 
       permission = Factory.insert!(:permission, action: "review:stage:reviewed")
       Factory.insert!(:role_permission, role: global_role, permission: permission)
-      Factory.insert!(:user_permission, user: approver, permission: permission)
+      Factory.insert!(:user_role, user: approver, role: global_role)
 
       conn = log_in_user(conn, approver)
       {:ok, view, html} = live(conn, ~p"/users")

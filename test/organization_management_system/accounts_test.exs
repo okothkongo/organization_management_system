@@ -475,26 +475,4 @@ defmodule OrganizationManagementSystem.AccountsTest do
     users = Accounts.list_users(scope)
     assert user in users
   end
-
-  describe "get_permissions_by_user_id/1" do
-    test "returns all permissions assigned to the user" do
-      user = Factory.insert!(:user)
-      permission1 = Factory.insert!(:permission)
-      permission2 = Factory.insert!(:permission, action: "action2")
-      # Assign permissions to user
-      Factory.insert!(:user_permission, user: user, permission: permission1)
-      Factory.insert!(:user_permission, user: user, permission: permission2)
-
-      permissions = Accounts.get_permissions_by_user_id(user.id)
-      assert permission1 in permissions
-      assert permission2 in permissions
-      assert length(permissions) == 2
-    end
-
-    test "returns empty list if user has no permissions" do
-      user = Factory.insert!(:user)
-      permissions = Accounts.get_permissions_by_user_id(user.id)
-      assert permissions == []
-    end
-  end
 end

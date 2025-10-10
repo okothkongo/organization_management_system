@@ -55,7 +55,7 @@ defmodule OrganizationManagementSystemWeb.OrganisationMemberLive.IndexTest do
 
       permission = Factory.insert!(:permission, action: "org:member:add")
       Factory.insert!(:role_permission, role: role, permission: permission)
-      Factory.insert!(:user_permission, user: user_who_can_add_member, permission: permission)
+      Factory.insert!(:user_role, user: user_who_can_add_member, role: role)
       %{org: org, user_who_can_add_member: user_who_can_add_member}
     end
 

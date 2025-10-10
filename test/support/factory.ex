@@ -70,14 +70,6 @@ defmodule OrganizationManagementSystem.Factory do
     }
   end
 
-  def build(:user_permission) do
-    %OrganizationManagementSystem.Accounts.UserPermission{
-      user: build(:user),
-      permission: build(:permission),
-      granted_by: build(:super_user)
-    }
-  end
-
   def build(:organization) do
     %OrganizationManagementSystem.Organizations.Organization{
       name: "Some Organization",

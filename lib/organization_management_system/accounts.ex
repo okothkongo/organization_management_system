@@ -4,9 +4,7 @@ defmodule OrganizationManagementSystem.Accounts do
   """
 
   import Ecto.Query, warn: false
-  alias OrganizationManagementSystem.Organizations
 
-  alias OrganizationManagementSystem.Accounts.UserPermission
   alias OrganizationManagementSystem.Accounts.RolePermission
   alias OrganizationManagementSystem.Accounts.Abilities
   alias OrganizationManagementSystem.Repo
@@ -16,7 +14,7 @@ defmodule OrganizationManagementSystem.Accounts do
   alias OrganizationManagementSystem.Accounts.Role
   alias OrganizationManagementSystem.Accounts.Scope
   alias OrganizationManagementSystem.Accounts.Permission
-  alias OrganizationManagementSystem.Organizations.OrganizationUser
+
   alias OrganizationManagementSystem.Accounts.UserRole
   alias Ecto.Multi
 
@@ -450,27 +448,22 @@ defmodule OrganizationManagementSystem.Accounts do
     end
   end
 
-  @doc """
-  Returns the list of permissions for a given user_id.
-
-  This function joins the user_permissions and permissions tables
-  to find all permissions assigned to the user.
-
-  ## Examples
-
-      iex> get_permissions_by_user_id(1)
-      [%Permission{}, ...]
-  """
-  @spec get_permissions_by_user_id(integer()) :: [Permission.t()]
-  def get_permissions_by_user_id(user_id) do
+  def has_permission?(user_id, permission_action) do
     query =
-      from p in Permission,
-        join: up in UserPermission,
-        on: up.permission_id == p.id,
-        where: up.user_id == ^user_id,
-        select: p
+      from(u in User,
+        join: ur in UserRole,
+        on: ur.user_id == u.id,
+        join: r in Role,
+        on: r.id == ur.role_id,
+        join: rp in RolePermission,
+        on: rp.role_id == r.id,
+        join: p in Permission,
+        on: p.id == rp.permission_id,
+        where: u.id == ^user_id and p.action == ^permission_action,
+        select: p.id
+      )
 
-    Repo.all(query)
+    Repo.exists?(query)
   end
 
   @doc """

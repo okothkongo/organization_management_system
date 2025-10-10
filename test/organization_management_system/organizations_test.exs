@@ -48,7 +48,6 @@ defmodule OrganizationManagementSystem.OrganizationsTest do
       org = Factory.insert!(:organization)
       org2 = Factory.insert!(:organization)
       org3 = Factory.insert!(:organization)
-      role = Factory.insert!(:role, scope: :organisation, name: "member")
 
       Factory.insert!(:organization_user,
         user: user,

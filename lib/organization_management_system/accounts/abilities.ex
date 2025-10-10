@@ -23,50 +23,41 @@ defmodule OrganizationManagementSystem.Accounts.Abilities do
   @add_org_member "org:member:add"
   @grant_org_role "org:member:grant_role"
 
-  def can_create_role?(current_user) do
-    current_user.is_super_user?
-  end
-
-  def can_review_or_approve?(%{is_super_user?: true}) do
-    true
-  end
-
   def can_review_or_approve?(current_user) do
-    can_approve_user?(current_user) or can_review_user?(current_user)
+    can_approve_user?(current_user) or can_review_user?(current_user) or
+      current_user.is_super_user?
   end
 
   def has_priviledged_acces?(user) do
-    user.is_super_user? or @priviledged_permission in get_permissions_actions(user.id)
+    user.is_super_user? or Accounts.has_permission?(user.id, @priviledged_permission)
   end
 
   def can_approve_user?(user) do
     user.is_super_user? or
-      @approve_user_permission in get_permissions_actions(user.id)
+      Accounts.has_permission?(user.id, @approve_user_permission)
   end
 
   def can_review_user?(user) do
-    user.is_super_user? or @review_user_permission in get_permissions_actions(user.id)
+    user.is_super_user? or Accounts.has_permission?(user.id, @review_user_permission)
   end
 
   def can_add_org_member?(user, org_id) do
     is_member_allowed_to_add =
       Organizations.member_of_org?(user.id, org_id) and
-        @add_org_member in get_permissions_actions(user.id)
+        Accounts.has_permission?(user.id, @add_org_member)
 
-    user.is_super_user? or is_member_allowed_to_add or
-      @priviledged_permission in get_permissions_actions(user.id)
+    privileged = Accounts.has_permission?(user.id, @priviledged_permission)
+
+    user.is_super_user? or is_member_allowed_to_add or privileged
   end
 
   def can_grant_role?(user, org_id) do
     can_grant_role =
       Organizations.member_of_org?(user.id, org_id) and
-        @grant_org_role in get_permissions_actions(user.id)
+        Accounts.has_permission?(user.id, @grant_org_role)
 
-    can_grant_role or user.is_super_user? or
-      @priviledged_permission in get_permissions_actions(user.id)
-  end
+    privileged = Accounts.has_permission?(user.id, @priviledged_permission)
 
-  defp get_permissions_actions(user_id) do
-    user_id |> Accounts.get_permissions_by_user_id() |> Enum.map(& &1.action)
+    can_grant_role or user.is_super_user? or privileged
   end
 end
