@@ -324,7 +324,8 @@ defmodule OrganizationManagementSystemWeb.UserAuth do
     end
   end
 
-  def on_mount(:require_authenticated_org_member, _params, session, socket) do
+  def on_mount(:require_authenticated_org_member, params, session, socket) do
+    org_id = params["org_id"]
     socket = mount_current_scope(socket, session)
 
     current_user = socket.assigns[:current_scope] && socket.assigns.current_scope.user
@@ -336,7 +337,7 @@ defmodule OrganizationManagementSystemWeb.UserAuth do
         |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
         |> then(&{:halt, &1})
 
-      !Abilities.can_add_org_member?(current_user) ->
+      !Abilities.can_add_org_member?(current_user, org_id) ->
         socket
         |> Phoenix.LiveView.put_flash(:error, "You are not authorized to access this page.")
         |> Phoenix.LiveView.redirect(to: ~p"/dashboard")
@@ -346,7 +347,6 @@ defmodule OrganizationManagementSystemWeb.UserAuth do
         {:cont, socket}
     end
   end
-
 
   def on_mount(:require_sudo_mode, _params, session, socket) do
     socket = mount_current_scope(socket, session)

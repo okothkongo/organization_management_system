@@ -1,4 +1,5 @@
 defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Index do
+  alias OrganizationManagementSystem.Accounts.Abilities
   use OrganizationManagementSystemWeb, :live_view
 
   @impl true
@@ -8,9 +9,11 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Index do
       <.header>
         Listing Organisations Memberships
         <:actions>
-          <.button variant="primary" navigate={~p"/organisations/members/new?#{[org_id: @org_id]}"}>
-            <.icon name="hero-plus" /> Add Member
-          </.button>
+          <%= if can_add_member?(@current_scope.user, @org_id) do %>
+            <.button variant="primary" navigate={~p"/organisations/members/new?#{[org_id: @org_id]}"}>
+              <.icon name="hero-plus" /> Add Member
+            </.button>
+          <% end %>
         </:actions>
       </.header>
 
@@ -33,7 +36,11 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Index do
      |> stream(:organisation_members, list_members(org_id))}
   end
 
-  def list_members(org_id) do
+  defp list_members(org_id) do
     OrganizationManagementSystem.Organizations.list_organization_members(org_id)
+  end
+
+  defp can_add_member?(current_user, org_id) do
+    Abilities.can_add_org_member?(current_user, org_id)
   end
 end

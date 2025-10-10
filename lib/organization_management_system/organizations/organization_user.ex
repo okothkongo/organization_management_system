@@ -20,5 +20,9 @@ defmodule OrganizationManagementSystem.Organizations.OrganizationUser do
     |> cast(attrs, [:organisation_id, :user_id, :role_id])
     |> validate_required([:organisation_id, :user_id])
     |> put_change(:invited_by_id, user_scope.user.id)
+    |> unique_constraint([:organisation_id, :user_id],
+      name: :organisation_users_organisation_id_user_id_index,
+      message: "This user is already a member of the organization"
+    )
   end
 end
