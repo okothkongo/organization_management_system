@@ -85,6 +85,15 @@ defmodule OrganizationManagementSystem.Factory do
     }
   end
 
+  def build(:organization_user) do
+    %OrganizationManagementSystem.Organizations.OrganizationUser{
+      organisation: build(:organization),
+      user: build(:user),
+      role: build(:role),
+      invited_by: build(:super_user)
+    }
+  end
+
   # Convenience API
 
   def build(factory_name, attributes) do

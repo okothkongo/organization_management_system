@@ -54,6 +54,7 @@ defmodule OrganizationManagementSystemWeb.Router do
       on_mount: [{OrganizationManagementSystemWeb.UserAuth, :require_authenticated}] do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
+      live "/organisations/members", OrganizationMemberLive.Index, :index
       get "/dashboard", PageController, :dashboard
     end
 
@@ -80,7 +81,6 @@ defmodule OrganizationManagementSystemWeb.Router do
 
     live_session :require_authenticated_org_member,
       on_mount: [{OrganizationManagementSystemWeb.UserAuth, :require_authenticated_org_member}] do
-      live "/organisations/members", OrganizationMemberLive.Index, :index
       live "/organisations/members/new", OrganizationMemberLive.Form, :new
     end
   end

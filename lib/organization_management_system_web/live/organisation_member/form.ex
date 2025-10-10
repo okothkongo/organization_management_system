@@ -14,12 +14,14 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Form do
       </.header>
 
       <.form for={@form} id="member-form" phx-change="validate" phx-submit="save">
-        <div :if={@form.errors != []} class="alert alert-error mb-4">
+        <div :if={filtered_errors(@form.errors) != []} class="alert alert-error mb-4">
           <.icon name="hero-exclamation-triangle" class="size-6 shrink-0" />
           <div>
             <h3 class="font-bold">Please fix the following errors:</h3>
             <ul class="list-disc list-inside">
-              <li :for={{_field, error} <- @form.errors}>{translate_error(error)}</li>
+              <li :for={{_field, error} <- filtered_errors(@form.errors)}>
+                {translate_error(error)}
+              </li>
             </ul>
           </div>
         </div>
@@ -66,7 +68,7 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Form do
     }
 
     socket
-    |> assign(:page_title, "New OMembership")
+    |> assign(:page_title, "New Membership")
     |> assign(:organization_user, organization_user)
     |> assign(
       :form,
@@ -131,5 +133,12 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Form do
     org_id
     |> OrganizationManagementSystem.Organizations.list_roles_by_organization()
     |> Enum.map(&{&1.name, &1.id})
+  end
+
+  defp filtered_errors(errors) do
+    Enum.reject(errors, fn
+      {:user_id, {"can't be blank", _}} -> true
+      _ -> false
+    end)
   end
 end
