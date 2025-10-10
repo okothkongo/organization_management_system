@@ -22,7 +22,7 @@ super_user =
   })
 
 Repo.insert!(%Permission{
-  action: "org:create",
+  action: "priviledged:access",
   description: "Can  create and other operations on org"
 })
 

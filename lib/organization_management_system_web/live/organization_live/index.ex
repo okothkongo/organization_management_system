@@ -38,6 +38,14 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
             <.icon name="hero-users" /> View Members
           </.button>
         </:col>
+        <:action :let={{_id, organization}}>
+          <%= if has_privildged_access(@current_scope.user) do %>
+
+          <.link navigate={~p"/organisations/#{organization}/edit"}>
+            Edit
+          </.link>
+          <% end %>
+        </:action>
       </.table>
     </Layouts.app>
     """
@@ -59,7 +67,7 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
 
   @impl true
   def handle_info({type, %Organization{}}, socket)
-      when type in [:created] do
+      when type in [:created, :updated] do
     current_user = socket.assigns.current_scope.user
     {:noreply, stream(socket, :organisations, list_user_organisations(current_user), reset: true)}
   end
@@ -73,5 +81,6 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
     Organizations.list_user_organisations(user)
   end
 
-  defp can_create_org?(current_user), do: Abilities.can_create_organisation?(current_user)
+  defp can_create_org?(current_user), do: Abilities.has_priviledged_acces?(current_user)
+  defp has_privildged_access(current_user), do: Abilities.has_priviledged_acces?(current_user)
 end

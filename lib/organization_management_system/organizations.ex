@@ -61,6 +61,20 @@ defmodule OrganizationManagementSystem.Organizations do
     end
   end
 
+  def update_organization(%Scope{} = scope, %Organization{} = organization, attrs) do
+    with {:ok, organization = %Organization{}} <-
+           organization
+           |> Organization.changeset(attrs, scope)
+           |> Repo.update() do
+      broadcast_organization(scope, {:updated, organization})
+      {:ok, organization}
+    end
+  end
+
+  def get_organization!(id) do
+    Repo.get!(Organization, id)
+  end
+
   @doc """
   Returns the list of all organizations where user is member.
   For super users and user with permission to create organisation, it returns all organizations.
@@ -180,7 +194,7 @@ defmodule OrganizationManagementSystem.Organizations do
   end
 
   defp maybe_filter_by_user(query, user) do
-    if Abilities.can_create_organisation?(user) do
+    if Abilities.has_priviledged_acces?(user) do
       query
     else
       from(o in query,

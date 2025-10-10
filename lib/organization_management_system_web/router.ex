@@ -77,6 +77,7 @@ defmodule OrganizationManagementSystemWeb.Router do
     live_session :require_authenticated_org_creator,
       on_mount: [{OrganizationManagementSystemWeb.UserAuth, :require_authenticated_org_creator}] do
       live "/organisations/new", OrganizationLive.Form, :new
+      live "/organisations/:id/edit", OrganizationLive.Form, :edit
     end
 
     live_session :require_authenticated_org_member,

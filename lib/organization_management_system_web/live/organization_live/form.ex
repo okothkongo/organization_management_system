@@ -46,6 +46,19 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Form do
     )
   end
 
+  defp apply_action(socket, :edit, %{"id" => id}) do
+    organization =
+      Organizations.get_organization!(id)
+
+    socket
+    |> assign(:page_title, "Edit Organization")
+    |> assign(:organization, organization)
+    |> assign(
+      :form,
+      to_form(Organizations.change_organization(socket.assigns.current_scope, organization))
+    )
+  end
+
   @impl true
   def handle_event("validate", %{"organization" => organization_params}, socket) do
     changeset =
@@ -68,6 +81,25 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Form do
         {:noreply,
          socket
          |> put_flash(:info, "Organization created successfully")
+         |> push_navigate(
+           to: return_path(socket.assigns.current_scope, socket.assigns.return_to, organization)
+         )}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, form: to_form(changeset))}
+    end
+  end
+
+  defp save_organization(socket, :edit, organization_params) do
+    case Organizations.update_organization(
+           socket.assigns.current_scope,
+           socket.assigns.organization,
+           organization_params
+         ) do
+      {:ok, organization} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Organization updated successfully")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, organization)
          )}

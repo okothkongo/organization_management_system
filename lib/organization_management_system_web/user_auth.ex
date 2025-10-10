@@ -313,7 +313,7 @@ defmodule OrganizationManagementSystemWeb.UserAuth do
         |> Phoenix.LiveView.redirect(to: ~p"/users/log-in")
         |> then(&{:halt, &1})
 
-      !Abilities.can_create_organisation?(current_user) ->
+      !Abilities.has_priviledged_acces?(current_user) ->
         socket
         |> Phoenix.LiveView.put_flash(:error, "You are not authorized to access this page.")
         |> Phoenix.LiveView.redirect(to: ~p"/dashboard")
