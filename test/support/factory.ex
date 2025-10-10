@@ -92,6 +92,7 @@ defmodule OrganizationManagementSystem.Factory do
       invited_by: build(:super_user)
     }
   end
+
   def build(:user_role) do
     %OrganizationManagementSystem.Accounts.UserRole{
       user: build(:user),

@@ -473,16 +473,6 @@ defmodule OrganizationManagementSystem.Accounts do
     Repo.all(query)
   end
 
-  def get_permission_by_action!(action) do
-    Repo.get_by!(Permission, action: action)
-  end
-
-  def create_user_permission(attrs, scope) do
-    %UserPermission{}
-    |> UserPermission.changeset(attrs, scope)
-    |> Repo.insert()
-  end
-
   @doc """
   Returns the list of permissions for a given role_id.
 
@@ -525,12 +515,14 @@ defmodule OrganizationManagementSystem.Accounts do
     |> Repo.insert()
   end
 
-
   def get_organisation_roles_not_assigned_to_user(user_id, org_id) do
     query =
       from r in Role,
         where: r.organisation_id == ^org_id,
-        where: r.id not in subquery(from ur in UserRole, where: ur.user_id == ^user_id, select: ur.role_id)
+        where:
+          r.id not in subquery(
+            from ur in UserRole, where: ur.user_id == ^user_id, select: ur.role_id
+          )
 
     Repo.all(query)
   end

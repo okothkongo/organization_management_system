@@ -107,12 +107,13 @@ defmodule OrganizationManagementSystem.OrganizationsTest do
         user: user,
         organisation: org
       )
+
       Factory.insert!(:user_role,
         user: user,
         organisation: org,
         scope: :organisation
-
       )
+
       assert Organizations.user_has_role_in_org?(user.id, org.id) == true
     end
 

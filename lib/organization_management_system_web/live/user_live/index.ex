@@ -97,7 +97,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.Index do
 
     role_id = params["value"]
 
-    case Accounts.assign_role_to_user(user_id, role_id)  do
+    case Accounts.assign_role_to_user(user_id, role_id) do
       {:ok, _} ->
         {:noreply,
          socket

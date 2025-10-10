@@ -171,11 +171,15 @@ defmodule OrganizationManagementSystem.Organizations do
       false
   """
   def user_has_role_in_org?(user_id, org_id) do
-    query =  from  ur in UserRole,
-       join: ou in OrganizationUser,
-       on: ou.user_id == ur.user_id,
-       where: ur.user_id == ^user_id and ou.organisation_id == ^org_id and not is_nil(ur.organisation_id)
-      Repo.exists?(query)
+    query =
+      from ur in UserRole,
+        join: ou in OrganizationUser,
+        on: ou.user_id == ur.user_id,
+        where:
+          ur.user_id == ^user_id and ou.organisation_id == ^org_id and
+            not is_nil(ur.organisation_id)
+
+    Repo.exists?(query)
   end
 
   def get_organization_user(user_id, org_id) do

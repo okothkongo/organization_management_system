@@ -467,17 +467,6 @@ defmodule OrganizationManagementSystem.AccountsTest do
       permissions = Accounts.list_permissions()
       assert permission in permissions
     end
-
-    test "get_permission_by_action!/1 fetches permission with existing action", %{
-      permission: permission
-    } do
-      fetched_permission = Accounts.get_permission_by_action!(permission.action)
-      assert fetched_permission == permission
-    end
-
-    test "get_permission_by_action!/1 throws error action does not exist" do
-      assert_raise Ecto.NoResultsError, fn -> Accounts.get_permission_by_action!("noexisting") end
-    end
   end
 
   test "list_user/0" do
@@ -486,8 +475,6 @@ defmodule OrganizationManagementSystem.AccountsTest do
     users = Accounts.list_users(scope)
     assert user in users
   end
-
-
 
   describe "get_permissions_by_user_id/1" do
     test "returns all permissions assigned to the user" do
