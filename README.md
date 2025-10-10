@@ -1,4 +1,3 @@
-Here you go — clean, ready to copy and paste ✅
 
 ---
 
