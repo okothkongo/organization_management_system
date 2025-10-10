@@ -4,9 +4,7 @@ defmodule OrganizationManagementSystem.Accounts do
   """
 
   import Ecto.Query, warn: false
-  alias OrganizationManagementSystem.Organizations
 
-  alias OrganizationManagementSystem.Accounts.UserPermission
   alias OrganizationManagementSystem.Accounts.RolePermission
   alias OrganizationManagementSystem.Accounts.Abilities
   alias OrganizationManagementSystem.Repo
@@ -16,7 +14,8 @@ defmodule OrganizationManagementSystem.Accounts do
   alias OrganizationManagementSystem.Accounts.Role
   alias OrganizationManagementSystem.Accounts.Scope
   alias OrganizationManagementSystem.Accounts.Permission
-  alias OrganizationManagementSystem.Organizations.OrganizationUser
+
+  alias OrganizationManagementSystem.Accounts.UserRole
   alias Ecto.Multi
 
   ## Database getters
@@ -449,37 +448,22 @@ defmodule OrganizationManagementSystem.Accounts do
     end
   end
 
-  @doc """
-  Returns the list of permissions for a given user_id.
-
-  This function joins the user_permissions and permissions tables
-  to find all permissions assigned to the user.
-
-  ## Examples
-
-      iex> get_permissions_by_user_id(1)
-      [%Permission{}, ...]
-  """
-  @spec get_permissions_by_user_id(integer()) :: [Permission.t()]
-  def get_permissions_by_user_id(user_id) do
+  def has_permission?(user_id, permission_action) do
     query =
-      from p in Permission,
-        join: up in UserPermission,
-        on: up.permission_id == p.id,
-        where: up.user_id == ^user_id,
-        select: p
+      from(u in User,
+        join: ur in UserRole,
+        on: ur.user_id == u.id,
+        join: r in Role,
+        on: r.id == ur.role_id,
+        join: rp in RolePermission,
+        on: rp.role_id == r.id,
+        join: p in Permission,
+        on: p.id == rp.permission_id,
+        where: u.id == ^user_id and p.action == ^permission_action,
+        select: p.id
+      )
 
-    Repo.all(query)
-  end
-
-  def get_permission_by_action!(action) do
-    Repo.get_by!(Permission, action: action)
-  end
-
-  def create_user_permission(attrs, scope) do
-    %UserPermission{}
-    |> UserPermission.changeset(attrs, scope)
-    |> Repo.insert()
+    Repo.exists?(query)
   end
 
   @doc """
@@ -511,43 +495,45 @@ defmodule OrganizationManagementSystem.Accounts do
   Assigns a user to a role within an organization.
   Returns {:ok, org_user} if successful or user already has the role.
   """
-  def assign_member_to_role(user_id, role_id, org_id, scope) do
-    case Organizations.get_organization_user(user_id, org_id) do
-      %OrganizationUser{role_id: ^role_id} ->
-        {:error, :user_already_has_role}
+  def assign_role_to_user(user_id, role_id, org_id \\ nil) do
+    role_scope = if org_id, do: :organisation, else: :global
 
-      org_user ->
-        org_user
-        |> OrganizationUser.changeset(%{role_id: role_id}, scope)
-        |> Repo.update()
-    end
+    %UserRole{}
+    |> UserRole.changeset(%{
+      user_id: user_id,
+      role_id: role_id,
+      scope: role_scope,
+      organisation_id: org_id
+    })
+    |> Repo.insert()
   end
 
-  @doc """
-  Gets all roles that a user has NOT been assigned in a specific organization.
-
-  ## Parameters
-    - user_id: The ID of the user
-    - org_id: The ID of the organization
-
-  ## Examples
-      iex> get_unassigned_roles_for_user(1, 5)
-      [%Role{}, ...]
-  """
-  def get_unassigned_roles_for_user(user_id, org_id) do
-    # Subquery to get the role_id the user currently has in this org
-    assigned_role_subquery =
-      from ou in OrganizationUser,
-        where: ou.user_id == ^user_id and ou.organisation_id == ^org_id,
-        select: ou.role_id
-
-    # Get all roles for this organization that are NOT assigned to the user
+  def get_organisation_roles_not_assigned_to_user(user_id, org_id) do
     query =
       from r in Role,
-        where: r.organisation_id == ^org_id or r.scope == :all,
-        where: r.id not in subquery(assigned_role_subquery),
-        order_by: [asc: r.name],
-        preload: [:permissions]
+        where: r.organisation_id == ^org_id,
+        where:
+          r.id not in subquery(
+            from ur in UserRole, where: ur.user_id == ^user_id, select: ur.role_id
+          )
+
+    Repo.all(query)
+  end
+
+  def user_has_global_role?(user_id) do
+    query =
+      from ur in UserRole,
+        where: ur.user_id == ^user_id and ur.scope == :global and is_nil(ur.organisation_id),
+        select: ur
+
+    Repo.exists?(query)
+  end
+
+  def list_global_roles do
+    query =
+      from r in Role,
+        where: r.scope == :global,
+        order_by: [asc: r.name]
 
     Repo.all(query)
   end

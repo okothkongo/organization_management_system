@@ -26,10 +26,10 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Index do
         <:col :let={{_id, organization_member}} label="Name">{organization_member.name}</:col>
         <:col :let={{_id, organization_member}} label="Email">{organization_member.email}</:col>
         <:action :let={{_id, organization_member}}>
-          <%= if member_has_role?(organization_member.id, @org_id) and can_grant_role?(@current_scope.user, @org_id) do %>
+          <%= if member_has_no_role?(organization_member.id, @org_id) and can_grant_role?(@current_scope.user, @org_id) do %>
             <select
               id={"role-select-#{organization_member.id}"}
-              phx-change="grant_role"
+              phx-click="grant_role"
               phx-value-id={organization_member.id}
             >
               <option value="">Assign Role</option>
@@ -55,12 +55,11 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Index do
 
   @impl true
   def handle_event("grant_role", params, socket) do
-    scope = socket.assigns.current_scope
     org_id = socket.assigns.org_id
     user_id = params["id"]
-    role_id = params["role_id"]
+    role_id = params["value"]
 
-    case Accounts.assign_member_to_role(user_id, role_id, org_id, scope) do
+    case Accounts.assign_role_to_user(user_id, role_id, org_id) do
       {:ok, _} ->
         {:noreply,
          socket
@@ -84,12 +83,12 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Index do
 
   defp list_assignable_roles(user_id, org_id) do
     user_id
-    |> Accounts.get_unassigned_roles_for_user(org_id)
+    |> Accounts.get_organisation_roles_not_assigned_to_user(org_id)
     |> Enum.map(&{&1.name, &1.id})
   end
 
-  defp member_has_role?(user_id, org_id) do
-    Organizations.user_has_role_in_org?(user_id, org_id)
+  defp member_has_no_role?(user_id, org_id) do
+    !Organizations.user_has_role_in_org?(user_id, org_id)
   end
 
   def can_grant_role?(current_user, org_id) do

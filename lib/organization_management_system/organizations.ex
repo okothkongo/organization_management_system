@@ -4,6 +4,7 @@ defmodule OrganizationManagementSystem.Organizations do
   """
 
   import Ecto.Query, warn: false
+  alias OrganizationManagementSystem.Accounts.UserRole
   alias OrganizationManagementSystem.Accounts.Abilities
   alias OrganizationManagementSystem.Repo
 
@@ -171,11 +172,12 @@ defmodule OrganizationManagementSystem.Organizations do
   """
   def user_has_role_in_org?(user_id, org_id) do
     query =
-      from ou in OrganizationUser,
+      from ur in UserRole,
+        join: ou in OrganizationUser,
+        on: ou.user_id == ur.user_id,
         where:
-          ou.user_id == ^user_id and
-            ou.organisation_id == ^org_id and
-            not is_nil(ou.role_id)
+          ur.user_id == ^user_id and ou.organisation_id == ^org_id and
+            not is_nil(ur.organisation_id)
 
     Repo.exists?(query)
   end

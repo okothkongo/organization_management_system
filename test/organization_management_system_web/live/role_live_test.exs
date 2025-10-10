@@ -7,7 +7,7 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
 
   @create_attrs %{
     name: "some name",
-    scope: "all",
+    scope: "global",
     description: "some description"
   }
 
@@ -43,7 +43,7 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
 
       assert render(form_live) =~ "New Role"
 
-      invalid_attrs = Map.put(@invalid_attrs, :scope, "all")
+      invalid_attrs = Map.put(@invalid_attrs, :scope, "global")
 
       assert form_live
              |> form("#role-form", role: invalid_attrs)

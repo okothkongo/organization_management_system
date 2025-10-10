@@ -104,7 +104,7 @@ defmodule OrganizationManagementSystem.AccountsFixtures do
       Enum.into(attrs, %{
         description: "some description",
         name: "some name",
-        scope: :all,
+        scope: :global,
         permission_id: permission.id
       })
 

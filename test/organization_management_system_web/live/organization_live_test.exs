@@ -30,18 +30,20 @@ defmodule OrganizationManagementSystemWeb.OrganizationLiveTest do
   end
 
   describe "User with abilities" do
-    @priveldged_user_permission "priviledged:access"
+    @priviledged_permission "priviledged:access"
     setup do
       priviledged = Factory.insert!(:user)
-      permission = Factory.insert!(:permission, action: @priveldged_user_permission)
-      role = Factory.insert!(:role, scope: :organisation, name: "Creator")
+      permission = Factory.insert!(:permission, action: @priviledged_permission)
+      role = Factory.insert!(:role, scope: :global, name: "Creator")
 
       Factory.insert!(:role_permission, role: role, permission: permission)
-      Factory.insert!(:user_permission, user: priviledged, permission: permission)
+
+      Factory.insert!(:user_role, user: priviledged, role: role)
+
       %{priviledged: priviledged}
     end
 
-    test "privedlged user create organization", %{
+    test "privilelged user create organization", %{
       conn: conn,
       priviledged: priviledged
     } do

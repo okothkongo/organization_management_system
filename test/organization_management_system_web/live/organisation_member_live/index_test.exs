@@ -11,8 +11,7 @@ defmodule OrganizationManagementSystemWeb.OrganisationMemberLive.IndexTest do
 
       Factory.insert!(:organization_user,
         user: user,
-        organisation: org,
-        role: Factory.insert!(:role, scope: :organisation, name: "member")
+        organisation: org
       )
 
       {:ok, logged_in_conn: log_in_user(conn, user), org: org}
@@ -51,13 +50,12 @@ defmodule OrganizationManagementSystemWeb.OrganisationMemberLive.IndexTest do
 
       Factory.insert!(:organization_user,
         user: user_who_can_add_member,
-        organisation: org,
-        role: role
+        organisation: org
       )
 
       permission = Factory.insert!(:permission, action: "org:member:add")
       Factory.insert!(:role_permission, role: role, permission: permission)
-      Factory.insert!(:user_permission, user: user_who_can_add_member, permission: permission)
+      Factory.insert!(:user_role, user: user_who_can_add_member, role: role)
       %{org: org, user_who_can_add_member: user_who_can_add_member}
     end
 

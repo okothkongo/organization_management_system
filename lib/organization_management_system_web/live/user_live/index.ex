@@ -25,28 +25,39 @@ defmodule OrganizationManagementSystemWeb.UserLive.Index do
         <:col :let={{_id, user}} label="Name">{user.name}</:col>
         <:col :let={{_id, user}} label="Email">{user.email}</:col>
         <:action :let={{_id, user}}>
-          <%= unless user.is_super_user? do %>
-            <%= cond do %>
-              <% user.status == :invited -> %>
-                <.link
-                  phx-click="review"
-                  phx-value-id={user.id}
-                  data-confirm="Are you sure you want to review this user?"
-                  class="btn btn-sm btn-danger ml-2"
-                >
-                  <.icon name="hero-eye" class="w-4 h-4" /> Review
-                </.link>
-              <% user.status == :reviewed -> %>
-                <.link
-                  phx-click="approve"
-                  phx-value-id={user.id}
-                  data-confirm="Are you sure you want to approve this user?"
-                  class="btn btn-sm btn-success ml-2"
-                >
-                  <.icon name="hero-check-circle" class="w-4 h-4" /> Approve
-                </.link>
-              <% true -> %>
-            <% end %>
+          <%= case {user.is_super_user?, user.status} do %>
+            <% {false, :invited} -> %>
+              <.link
+                phx-click="review"
+                phx-value-id={user.id}
+                data-confirm="Are you sure you want to review this user?"
+                class="btn btn-sm btn-danger ml-2"
+              >
+                <.icon name="hero-eye" class="w-4 h-4" /> Review
+              </.link>
+            <% {false, :reviewed} -> %>
+              <.link
+                phx-click="approve"
+                phx-value-id={user.id}
+                data-confirm="Are you sure you want to approve this user?"
+                class="btn btn-sm btn-success ml-2"
+              >
+                <.icon name="hero-check-circle" class="w-4 h-4" /> Approve
+              </.link>
+            <% _ -> %>
+          <% end %>
+
+          <%= if @current_scope.user.is_super_user? and has_no_global_role?(user.id) and !user.is_super_user? do %>
+            <select
+              id={"role-select-#{user.id}"}
+              phx-click="grant_role"
+              phx-value-id={user.id}
+            >
+              <option value="">Assign Role</option>
+              <%= for {label, value} <- list_roles() do %>
+                <option value={value}>{label}</option>
+              <% end %>
+            </select>
           <% end %>
         </:action>
       </.table>
@@ -61,7 +72,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.Index do
     {:ok,
      socket
      |> assign(:page_title, "List Users")
-     |> stream(:users, Accounts.list_users(scope))}
+     |> stream(:users, list_users(scope))}
   end
 
   @impl true
@@ -77,5 +88,38 @@ defmodule OrganizationManagementSystemWeb.UserLive.Index do
     Accounts.update_user(user, %{status: :reviewed})
 
     {:noreply, push_navigate(socket, to: ~p"/users")}
+  end
+
+  def handle_event("grant_role", params, socket) do
+    scope = socket.assigns.current_scope
+
+    user_id = params["id"]
+
+    role_id = params["value"]
+
+    case Accounts.assign_role_to_user(user_id, role_id) do
+      {:ok, _} ->
+        {:noreply,
+         socket
+         |> stream(:users, list_users(scope), reset: true)
+         |> put_flash(:info, "Role assigned successfully")
+         |> push_navigate(to: ~p"/users")}
+
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, "User already has the role")}
+    end
+  end
+
+  defp list_roles do
+    Accounts.list_global_roles()
+    |> Enum.map(&{&1.name, &1.id})
+  end
+
+  defp has_no_global_role?(user_id) do
+    !Accounts.user_has_global_role?(user_id)
+  end
+
+  defp list_users(scope) do
+    Accounts.list_users(scope)
   end
 end

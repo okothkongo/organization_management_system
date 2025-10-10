@@ -11,7 +11,7 @@ defmodule OrganizationManagementSystem.Accounts.Role do
 
   schema "roles" do
     field :name, :string
-    field :scope, Ecto.Enum, values: [:organisation, :all]
+    field :scope, Ecto.Enum, values: [:organisation, :global]
     field :description, :string
 
     field :permission_id, :id, virtual: true
@@ -45,7 +45,7 @@ defmodule OrganizationManagementSystem.Accounts.Role do
           "Organisation must be present for organisation scoped roles"
         )
 
-      :all when not is_nil(org_id) ->
+      :aglobal when not is_nil(org_id) ->
         add_error(changeset, :organisation_id, "Organisation is not allowed for all scoped roles")
 
       _ ->
