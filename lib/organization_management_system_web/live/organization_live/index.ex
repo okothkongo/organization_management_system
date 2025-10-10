@@ -2,6 +2,8 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
   use OrganizationManagementSystemWeb, :live_view
 
   alias OrganizationManagementSystem.Organizations
+  alias OrganizationManagementSystem.Organizations.Organization
+  alias OrganizationManagementSystem.Accounts.Abilities
 
   @impl true
   def render(assigns) do
@@ -10,7 +12,11 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
       <.header>
         Listing Organisations
         <:actions>
-          <.button variant="primary" navigate={~p"/organisations/new"}>
+          <.button
+            :if={can_create_org?(@current_scope.user)}
+            variant="primary"
+            navigate={~p"/organisations/new"}
+          >
             <.icon name="hero-plus" /> New Organization
           </.button>
         </:actions>
@@ -52,7 +58,7 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
   end
 
   @impl true
-  def handle_info({type, %OrganizationManagementSystem.Organizations.Organization{}}, socket)
+  def handle_info({type, %Organization{}}, socket)
       when type in [:created] do
     current_user = socket.assigns.current_scope.user
     {:noreply, stream(socket, :organisations, list_user_organisations(current_user), reset: true)}
@@ -66,4 +72,6 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
   defp list_user_organisations(user) do
     Organizations.list_user_organisations(user)
   end
+
+  defp can_create_org?(current_user), do: Abilities.can_create_organisation?(current_user)
 end
