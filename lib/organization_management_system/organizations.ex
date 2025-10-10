@@ -4,6 +4,7 @@ defmodule OrganizationManagementSystem.Organizations do
   """
 
   import Ecto.Query, warn: false
+  alias OrganizationManagementSystem.Accounts.Abilities
   alias OrganizationManagementSystem.Repo
 
   alias OrganizationManagementSystem.Organizations.Organization
@@ -61,14 +62,21 @@ defmodule OrganizationManagementSystem.Organizations do
   end
 
   @doc """
-  Returns the list of all organizations.
+  Returns the list of all organizations where user is member.
+  For super users and user with permission to create organisation, it returns all organizations.
 
   ## Examples
 
-      iex> list_organisations()
+      iex> list_user_organisations(user)
       [%Organization{}, ...]
 
   """
+  def list_user_organisations(user) do
+    Organization
+    |> maybe_filter_by_user(user)
+    |> Repo.all()
+  end
+
   def list_organisations do
     Repo.all(Organization)
   end
@@ -134,5 +142,17 @@ defmodule OrganizationManagementSystem.Organizations do
       )
 
     Repo.exists?(query)
+  end
+
+  defp maybe_filter_by_user(query, user) do
+    if Abilities.can_create_organisation?(user) do
+      query
+    else
+      from(o in query,
+        join: ou in OrganizationUser,
+        on: ou.organisation_id == o.id,
+        where: ou.user_id == ^user.id
+      )
+    end
   end
 end

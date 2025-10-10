@@ -171,15 +171,14 @@ defmodule OrganizationManagementSystemWeb.Layouts do
                 <.icon name="hero-user-plus" class="mr-4 size-6 shrink-0 text-primary-200" /> Users
               </.link>
             <% end %>
-            <%= if @current_scope.user.is_super_user? or organisation_creator?(@current_scope.user)  do %>
-              <.link
-                navigate={~p"/organisations"}
-                class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
-              >
-                <.icon name="hero-building-office" class="mr-4 size-6 shrink-0 text-primary-200" />
-                Organisations
-              </.link>
-            <% end %>
+
+            <.link
+              navigate={~p"/organisations"}
+              class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
+            >
+              <.icon name="hero-building-office" class="mr-4 size-6 shrink-0 text-primary-200" />
+              Organisations
+            </.link>
 
             <.link
               navigate={~p"/dashboard"}
@@ -214,8 +213,6 @@ defmodule OrganizationManagementSystemWeb.Layouts do
     </aside>
     """
   end
-
-  defp organisation_creator?(current_user), do: Abilities.can_create_organisation?(current_user)
 
   def can_review_or_approve?(current_user), do: Abilities.can_review_or_approve?(current_user)
 end
