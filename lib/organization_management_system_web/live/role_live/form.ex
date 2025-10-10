@@ -35,7 +35,7 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
           options={[{"Select Organisation", ""}] ++ list_organisation_options()}
         />
         <.input field={@form[:description]} type="text" label="Description" />
-        <.input field={@form[:system?]} type="checkbox" label="System?" />
+
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Role</.button>
           <.button navigate={return_path(@current_scope, @return_to, @role)}>Cancel</.button>

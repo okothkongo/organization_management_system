@@ -24,7 +24,7 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Index do
         <:col :let={{_id, role}} label="Name">{role.name}</:col>
         <:col :let={{_id, role}} label="Scope">{role.scope}</:col>
         <:col :let={{_id, role}} label="Description">{role.description}</:col>
-        <:col :let={{_id, role}} label="System?">{role.system?}</:col>
+
         <:action :let={{_id, role}}>
           <div class="sr-only">
             <.link navigate={~p"/roles/#{role}"}>Show</.link>

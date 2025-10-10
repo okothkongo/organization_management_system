@@ -21,7 +21,7 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Show do
         <:item title="Name">{@role.name}</:item>
         <:item title="Scope">{@role.scope}</:item>
         <:item title="Description">{@role.description}</:item>
-        <:item title="System?">{@role.system?}</:item>
+
       </.list>
     </Layouts.app>
     """
