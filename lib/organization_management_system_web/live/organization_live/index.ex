@@ -40,10 +40,9 @@ defmodule OrganizationManagementSystemWeb.OrganizationLive.Index do
         </:col>
         <:action :let={{_id, organization}}>
           <%= if has_privildged_access(@current_scope.user) do %>
-
-          <.link navigate={~p"/organisations/#{organization}/edit"}>
-            Edit
-          </.link>
+            <.link navigate={~p"/organisations/#{organization}/edit"}>
+              Edit
+            </.link>
           <% end %>
         </:action>
       </.table>

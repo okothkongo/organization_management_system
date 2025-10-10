@@ -53,7 +53,8 @@ defmodule OrganizationManagementSystem.Accounts.Abilities do
       Organizations.member_of_org?(user.id, org_id) and
         @add_org_member in get_permissions_actions(user.id)
 
-    user.is_super_user? or is_member_allowed_to_add
+    user.is_super_user? or is_member_allowed_to_add or
+      @priviledged_permission in get_permissions_actions(user.id)
   end
 
   def can_grant_role?(user, org_id) do
