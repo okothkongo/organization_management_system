@@ -59,7 +59,7 @@ defmodule OrganizationManagementSystem.Factory do
       name: "role_#{System.unique_integer()}",
       created_by: build(:super_user),
       description: "some role",
-      scope: :all
+      scope: :global
     }
   end
 
@@ -90,6 +90,14 @@ defmodule OrganizationManagementSystem.Factory do
       organisation: build(:organization),
       user: build(:user),
       invited_by: build(:super_user)
+    }
+  end
+  def build(:user_role) do
+    %OrganizationManagementSystem.Accounts.UserRole{
+      user: build(:user),
+      role: build(:role),
+      scope: :global,
+      organisation: nil
     }
   end
 

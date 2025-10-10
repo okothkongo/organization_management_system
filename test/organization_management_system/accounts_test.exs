@@ -431,7 +431,7 @@ defmodule OrganizationManagementSystem.AccountsTest do
 
       valid_attrs = %{
         name: "some name",
-        scope: :all,
+        scope: :global,
         description: "some description",
         permission_id: permission.id
       }
@@ -440,7 +440,7 @@ defmodule OrganizationManagementSystem.AccountsTest do
 
       assert {:ok, %Role{} = role} = Accounts.create_role(scope, valid_attrs)
       assert role.name == "some name"
-      assert role.scope == :all
+      assert role.scope == :global
       assert role.description == "some description"
 
       assert role.created_by_id == scope.user.id
@@ -487,14 +487,7 @@ defmodule OrganizationManagementSystem.AccountsTest do
     assert user in users
   end
 
-  describe "user_permission" do
-    test "create_user_permission/2 with valid attrs" do
-      scope = super_user_scope_fixture()
-      user = Factory.insert!(:user)
-      permission = Factory.insert!(:permission)
-      Accounts.create_user_permission(%{user_id: user.id, permission_id: permission.id}, scope)
-    end
-  end
+
 
   describe "get_permissions_by_user_id/1" do
     test "returns all permissions assigned to the user" do

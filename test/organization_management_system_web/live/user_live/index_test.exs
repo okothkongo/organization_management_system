@@ -34,7 +34,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.IndexTest do
       invited_user: invited_user
     } do
       reviewer = Factory.insert!(:user)
-      global_role = Factory.insert!(:role, scope: :all, name: "user_reviewer")
+      global_role = Factory.insert!(:role, scope: :global, name: "user_reviewer")
 
       permission = Factory.insert!(:permission, action: "review:stage:invited")
       Factory.insert!(:role_permission, role: global_role, permission: permission)
@@ -58,7 +58,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.IndexTest do
       reviewed_user: reviewed_user
     } do
       approver = Factory.insert!(:user)
-      global_role = Factory.insert!(:role, scope: :all, name: "user_approver")
+      global_role = Factory.insert!(:role, scope: :global, name: "user_approver")
 
       permission = Factory.insert!(:permission, action: "review:stage:reviewed")
       Factory.insert!(:role_permission, role: global_role, permission: permission)

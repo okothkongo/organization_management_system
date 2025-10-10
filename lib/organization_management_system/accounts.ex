@@ -512,8 +512,8 @@ defmodule OrganizationManagementSystem.Accounts do
   Assigns a user to a role within an organization.
   Returns {:ok, org_user} if successful or user already has the role.
   """
-  def create_user_role(user_id, role_id, org_id \\ nil) do
-    role_scope = if org_id, do: :organisation, else: :all
+  def assign_role_to_user(user_id, role_id, org_id \\ nil) do
+    role_scope = if org_id, do: :organisation, else: :global
 
     %UserRole{}
     |> UserRole.changeset(%{
@@ -525,31 +525,30 @@ defmodule OrganizationManagementSystem.Accounts do
     |> Repo.insert()
   end
 
-  @doc """
-  Gets all roles that a user has NOT been assigned in a specific organization.
 
-  ## Parameters
-    - user_id: The ID of the user
-    - org_id: The ID of the organization
-
-  ## Examples
-      iex> get_unassigned_roles_for_user(1, 5)
-      [%Role{}, ...]
-  """
-  def get_unassigned_roles_for_user(user_id, org_id) do
-    # Subquery to get the role_id the user currently has in this org
-    assigned_role_subquery =
-      from ou in OrganizationUser,
-        where: ou.user_id == ^user_id and ou.organisation_id == ^org_id,
-        select: ou.role_id
-
-    # Get all roles for this organization that are NOT assigned to the user
+  def get_organisation_roles_not_assigned_to_user(user_id, org_id) do
     query =
       from r in Role,
-        where: r.organisation_id == ^org_id or r.scope == :all,
-        where: r.id not in subquery(assigned_role_subquery),
-        order_by: [asc: r.name],
-        preload: [:permissions]
+        where: r.organisation_id == ^org_id,
+        where: r.id not in subquery(from ur in UserRole, where: ur.user_id == ^user_id, select: ur.role_id)
+
+    Repo.all(query)
+  end
+
+  def user_has_global_role?(user_id) do
+    query =
+      from ur in UserRole,
+        where: ur.user_id == ^user_id and ur.scope == :global and is_nil(ur.organisation_id),
+        select: ur
+
+    Repo.exists?(query)
+  end
+
+  def list_global_roles do
+    query =
+      from r in Role,
+        where: r.scope == :global,
+        order_by: [asc: r.name]
 
     Repo.all(query)
   end

@@ -11,8 +11,7 @@ defmodule OrganizationManagementSystemWeb.OrganisationMemberLive.IndexTest do
 
       Factory.insert!(:organization_user,
         user: user,
-        organisation: org,
-        role: Factory.insert!(:role, scope: :organisation, name: "member")
+        organisation: org
       )
 
       {:ok, logged_in_conn: log_in_user(conn, user), org: org}
