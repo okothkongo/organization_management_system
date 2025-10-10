@@ -105,7 +105,6 @@ defmodule OrganizationManagementSystem.AccountsFixtures do
         description: "some description",
         name: "some name",
         scope: :all,
-        system?: true,
         permission_id: permission.id
       })
 

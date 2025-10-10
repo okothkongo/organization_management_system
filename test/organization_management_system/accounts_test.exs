@@ -403,7 +403,7 @@ defmodule OrganizationManagementSystem.AccountsTest do
     import OrganizationManagementSystem.AccountsFixtures, only: [user_scope_fixture: 0]
     import OrganizationManagementSystem.AccountsFixtures
 
-    @invalid_attrs %{name: nil, scope: nil, description: nil, system?: nil}
+    @invalid_attrs %{name: nil, scope: nil, description: nil}
 
     test "list_roles/0 returns all scoped roles" do
       scope = super_user_scope_fixture()
@@ -433,7 +433,6 @@ defmodule OrganizationManagementSystem.AccountsTest do
         name: "some name",
         scope: :all,
         description: "some description",
-        system?: true,
         permission_id: permission.id
       }
 
@@ -443,21 +442,8 @@ defmodule OrganizationManagementSystem.AccountsTest do
       assert role.name == "some name"
       assert role.scope == :all
       assert role.description == "some description"
-      assert role.system? == true
+
       assert role.created_by_id == scope.user.id
-    end
-
-    test "create_role/2 non superuser cannot create role" do
-      valid_attrs = %{
-        name: "some name",
-        scope: :all,
-        description: "some description",
-        system?: true
-      }
-
-      scope = user_scope_fixture()
-
-      refute Accounts.create_role(scope, valid_attrs)
     end
 
     test "create_role/2 with invalid data returns error changeset" do

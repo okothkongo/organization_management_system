@@ -35,7 +35,7 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
           options={[{"Select Organisation", ""}] ++ list_organisation_options()}
         />
         <.input field={@form[:description]} type="text" label="Description" />
-        <.input field={@form[:system?]} type="checkbox" label="System?" />
+
         <footer>
           <.button phx-disable-with="Saving..." variant="primary">Save Role</.button>
           <.button navigate={return_path(@current_scope, @return_to, @role)}>Cancel</.button>
@@ -78,12 +78,8 @@ defmodule OrganizationManagementSystemWeb.RoleLive.Form do
   end
 
   defp save_role(socket, :new, role_params) do
-    permission_id = role_params["permission_id"]
-
     case Accounts.create_role(socket.assigns.current_scope, role_params) do
       {:ok, role} ->
-        Accounts.create_role_permission(%{role_id: role.id, permission_id: permission_id})
-
         {:noreply,
          socket
          |> put_flash(:info, "Role created successfully")

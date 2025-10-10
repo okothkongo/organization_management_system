@@ -181,17 +181,6 @@ defmodule OrganizationManagementSystemWeb.Layouts do
             </.link>
 
             <.link
-              navigate={~p"/dashboard"}
-              aria-current="page"
-              class={[
-                "group flex items-center rounded-md px-2 py-2 text-sm font-medium",
-                "bg-primary-800 text-white"
-              ]}
-            >
-              <.icon name="hero-home" class="mr-4 size-6 shrink-0 text-primary-200" /> Dashboard
-            </.link>
-
-            <.link
               navigate={~p"/users/settings"}
               class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
             >

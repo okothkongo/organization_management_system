@@ -13,7 +13,7 @@ defmodule OrganizationManagementSystem.Accounts.Role do
     field :name, :string
     field :scope, Ecto.Enum, values: [:organisation, :all]
     field :description, :string
-    field :system?, :boolean, default: false
+
     field :permission_id, :id, virtual: true
     belongs_to :created_by, User, foreign_key: :created_by_id
 
@@ -28,16 +28,29 @@ defmodule OrganizationManagementSystem.Accounts.Role do
   @doc false
   def changeset(role, attrs, scope) do
     role
-    |> cast(attrs, [:name, :scope, :description, :system?, :permission_id, :organisation_id])
-    |> validate_required([:name, :scope, :description, :system?, :permission_id])
+    |> cast(attrs, [:name, :scope, :description, :permission_id, :organisation_id])
+    |> validate_required([:name, :scope, :description, :permission_id])
     |> put_change(:created_by_id, scope.user.id)
     |> validate_organisation()
   end
 
-  def validate_organisation(
-        %Ecto.Changeset{changes: %{scope: :all, organisation_id: _id}} = changeset
-      ) do
-    add_error(changeset, :organisation_id, "Only organisation scope role require organisation")
+  def validate_organisation(%Ecto.Changeset{changes: %{scope: scope}} = changeset) do
+    org_id = get_change(changeset, :organisation_id)
+
+    case scope do
+      :organisation when is_nil(org_id) ->
+        add_error(
+          changeset,
+          :organisation_id,
+          "Organisation must be present for organisation scoped roles"
+        )
+
+      :all when not is_nil(org_id) ->
+        add_error(changeset, :organisation_id, "Organisation is not allowed for all scoped roles")
+
+      _ ->
+        changeset
+    end
   end
 
   def validate_organisation(changeset), do: changeset

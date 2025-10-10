@@ -8,11 +8,10 @@ defmodule OrganizationManagementSystemWeb.RoleLiveTest do
   @create_attrs %{
     name: "some name",
     scope: "all",
-    description: "some description",
-    system?: true
+    description: "some description"
   }
 
-  @invalid_attrs %{name: nil, scope: nil, description: nil, system?: false}
+  @invalid_attrs %{name: nil, scope: nil, description: nil}
 
   describe "super user" do
     setup :register_and_log_in_super_user
