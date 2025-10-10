@@ -10,6 +10,7 @@ defmodule OrganizationManagementSystem.Organizations do
   alias OrganizationManagementSystem.Accounts.Scope
   alias OrganizationManagementSystem.Accounts.Role
   alias OrganizationManagementSystem.Organizations.OrganizationUser
+  alias OrganizationManagementSystem.Accounts.User
 
   @doc """
   Subscribes to scoped notifications about any organization changes.
@@ -87,8 +88,8 @@ defmodule OrganizationManagementSystem.Organizations do
   """
   def list_organization_members(org_id) do
     query =
-      from(u in OrganizationManagementSystem.Accounts.User,
-        join: ou in OrganizationManagementSystem.Organizations.OrganizationUser,
+      from(u in User,
+        join: ou in OrganizationUser,
         on: ou.user_id == u.id,
         where: ou.organisation_id == ^org_id
       )
@@ -117,5 +118,21 @@ defmodule OrganizationManagementSystem.Organizations do
     %OrganizationUser{}
     |> OrganizationUser.changeset(attrs, scope)
     |> Repo.insert()
+  end
+
+  @doc """
+  Checks if the user is a member of any organization.
+
+  Returns true if the user is a member, otherwise false.
+  """
+  def member_of_org?(user_id, org_id) do
+    query =
+      from(u in User,
+        join: ou in OrganizationUser,
+        on: ou.user_id == u.id,
+        where: u.id == ^user_id and ou.organisation_id == ^org_id
+      )
+
+    Repo.exists?(query)
   end
 end
