@@ -38,6 +38,16 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Index do
               <% end %>
             </select>
           <% end %>
+          <%= if !member_has_no_role?(organization_member.id, @org_id) and can_grant_role?(@current_scope.user, @org_id) do %>
+            <.button
+              variant="primary"
+              phx-value-id={organization_member.id}
+              phx-click="revoke role"
+              data-confirm="Are you sure you to revoke this user's role?"
+            >
+              <.icon name="hero-minus" /> Revoke Role
+            </.button>
+          <% end %>
         </:action>
       </.table>
     </Layouts.app>
@@ -71,6 +81,19 @@ defmodule OrganizationManagementSystemWeb.OrganizationMemberLive.Index do
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "Member already has the role")}
     end
+  end
+
+  def handle_event("revoke role", params, socket) do
+    org_id = socket.assigns.org_id
+    user_id = params["id"]
+    Organizations.delete_organization_member_role(user_id, org_id)
+
+    {:noreply,
+     socket
+     |> stream(:organisation_members, list_members(org_id), reset: true)
+     |> put_flash(:info, "Role revoked successfully")
+     |> assign(:page_title, "Listing Organisation Memberships")
+     |> push_navigate(to: ~p"/organisations/members?org_id=#{org_id}")}
   end
 
   defp list_members(org_id) do

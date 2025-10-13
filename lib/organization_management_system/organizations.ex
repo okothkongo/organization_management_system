@@ -195,6 +195,26 @@ defmodule OrganizationManagementSystem.Organizations do
     Repo.exists?(query)
   end
 
+  def delete_organization_member_role(user_id, org_id) do
+    query =
+      from ur in UserRole,
+        join: ou in OrganizationUser,
+        on: ou.user_id == ur.user_id,
+        where:
+          ur.user_id == ^user_id and ou.organisation_id == ^org_id and
+            ur.organisation_id == ^org_id
+
+    Repo.delete_all(query)
+  end
+
+  def delete_global_role(user_id) do
+    query =
+      from ur in UserRole,
+        where: ur.user_id == ^user_id and is_nil(ur.organisation_id)
+
+    Repo.delete_all(query)
+  end
+
   defp maybe_filter_by_user(query, user) do
     if Abilities.has_priviledged_acces?(user) do
       query

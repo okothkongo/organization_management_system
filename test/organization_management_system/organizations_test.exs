@@ -1,4 +1,5 @@
 defmodule OrganizationManagementSystem.OrganizationsTest do
+  alias Hex.API.Key.Organization
   alias OrganizationManagementSystem.Factory
   use OrganizationManagementSystem.DataCase
 
@@ -177,6 +178,55 @@ defmodule OrganizationManagementSystem.OrganizationsTest do
     test "list_roles_by_organization/1 returns empty list if org has no roles" do
       org = Factory.insert!(:organization)
       assert [] = Organizations.list_roles_by_organization(org.id)
+    end
+  end
+
+  describe "delete_organization_member_role/2" do
+    setup do
+      org = Factory.insert!(:organization)
+      org2 = Factory.insert!(:organization)
+
+      user_member1 = Factory.insert!(:user)
+      user_member2 = Factory.insert!(:user)
+      non_member = Factory.insert!(:user)
+      global_user = Factory.insert!(:user)
+
+      org_role = Factory.insert!(:user_role, user: user_member1, organisation: org)
+      org_role2 = Factory.insert!(:user_role, user: user_member2, organisation: org)
+      non_role = Factory.insert!(:user_role, user: non_member, organisation: org2)
+      global_role = Factory.insert!(:user_role, user: global_user)
+
+      _org_member = Factory.insert!(:organization_user, user: user_member1, organisation: org)
+      _org_member2 = Factory.insert!(:organization_user, user: user_member2, organisation: org)
+      _non_member = Factory.insert!(:organization_user, user: user_member1, organisation: org2)
+
+      %{
+        org_role: org_role,
+        org_role2: org_role2,
+        non_role: non_role,
+        global_role: global_role,
+        org: org,
+        user_member1: user_member1
+      }
+    end
+
+    test "delete only role of user for given organisation", context do
+      %{
+        org_role: org_role,
+        org_role2: org_role2,
+        non_role: non_role,
+        global_role: global_role,
+        org: org,
+        user_member1: user_member1
+      } = context
+
+      assert {1, _} = Organizations.delete_organization_member_role(user_member1.id, org.id)
+      user_roles = Repo.all(OrganizationManagementSystem.Accounts.UserRole)
+      user_role_ids = Enum.map(user_roles, fn user_role -> user_role.id end)
+      refute org_role.id in user_role_ids
+      assert org_role2.id in user_role_ids
+      assert non_role.id in user_role_ids
+      assert global_role.id in user_role_ids
     end
   end
 end

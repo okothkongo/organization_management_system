@@ -45,7 +45,7 @@ defmodule OrganizationManagementSystem.Accounts.Role do
           "Organisation must be present for organisation scoped roles"
         )
 
-      :aglobal when not is_nil(org_id) ->
+      :global when not is_nil(org_id) ->
         add_error(changeset, :organisation_id, "Organisation is not allowed for all scoped roles")
 
       _ ->

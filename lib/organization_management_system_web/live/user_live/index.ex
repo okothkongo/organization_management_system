@@ -2,6 +2,7 @@ defmodule OrganizationManagementSystemWeb.UserLive.Index do
   use OrganizationManagementSystemWeb, :live_view
 
   alias OrganizationManagementSystem.Accounts
+  alias OrganizationManagementSystem.Organizations
 
   @impl true
   def render(assigns) do
@@ -59,6 +60,16 @@ defmodule OrganizationManagementSystemWeb.UserLive.Index do
               <% end %>
             </select>
           <% end %>
+          <%= if @current_scope.user.is_super_user? and !has_no_global_role?(user.id) and !user.is_super_user? do %>
+            <.button
+              variant="primary"
+              phx-value-id={user.id}
+              phx-click="revoke role"
+              data-confirm="Are you sure you to revoke this user's role?"
+            >
+              <.icon name="hero-minus" /> Revoke Role
+            </.button>
+          <% end %>
         </:action>
       </.table>
     </Layouts.app>
@@ -108,6 +119,20 @@ defmodule OrganizationManagementSystemWeb.UserLive.Index do
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "User already has the role")}
     end
+  end
+
+  def handle_event("revoke role", params, socket) do
+    scope = socket.assigns.current_scope
+
+    user_id = params["id"]
+
+    Organizations.delete_global_role(user_id)
+
+    {:noreply,
+     socket
+     |> stream(:users, list_users(scope), reset: true)
+     |> put_flash(:info, "Role revoked successfully")
+     |> push_navigate(to: ~p"/users")}
   end
 
   defp list_roles do
