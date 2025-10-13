@@ -18,26 +18,22 @@ defmodule OrganizationManagementSystem.Accounts.UserRole do
     timestamps(type: :utc_datetime)
   end
 
-  @spec changeset(
-          {map(),
-           %{
-             optional(atom()) =>
-               atom()
-               | {:array | :assoc | :embed | :in | :map | :parameterized | :supertype | :try,
-                  any()}
-           }}
-          | %{
-              :__struct__ => atom() | %{:__changeset__ => any(), optional(any()) => any()},
-              optional(atom()) => any()
-            },
-          :invalid | %{optional(:__struct__) => none(), optional(atom() | binary()) => any()}
-        ) :: Ecto.Changeset.t()
   def changeset(user_role, attrs) do
     user_role
     |> cast(attrs, [:user_id, :role_id, :scope, :organisation_id])
     |> validate_required([:user_id, :role_id, :scope])
     |> validate_org_scope()
-    |> unique_constraint([:user_id, :role_id, :organisation_id])
+    |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:role_id)
+    |> foreign_key_constraint(:organisation_id)
+    |> unique_constraint([:user_id, :role_id, :organisation_id],
+      name: :user_roles_with_org_unique_index,
+      message: "User already has this role in this organisation"
+    )
+    |> unique_constraint([:user_id, :role_id],
+      name: :user_roles_without_org_unique_index,
+      message: "User already has this global role"
+    )
   end
 
   defp validate_org_scope(changeset) do

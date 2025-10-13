@@ -13,7 +13,7 @@ alias OrganizationManagementSystem.Repo
 alias OrganizationManagementSystem.Accounts.User
 alias OrganizationManagementSystem.Accounts.Permission
 
-super_user =
+_super_user =
   Repo.insert!(%User{
     email: "admin@example.com",
     name: "Super Admin",
