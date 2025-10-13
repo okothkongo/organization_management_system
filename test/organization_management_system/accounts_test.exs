@@ -475,4 +475,47 @@ defmodule OrganizationManagementSystem.AccountsTest do
     users = Accounts.list_users(scope)
     assert user in users
   end
+
+  describe "assign_role_to_user/2 or 3" do
+    test "assigns organisation role" do
+      user = Factory.insert!(:user)
+      role = Factory.insert!(:role)
+      org = Factory.insert!(:organization)
+      assert {:ok, user_role} = Accounts.assign_role_to_user(user.id, role.id, org.id)
+      assert user_role.role_id == role.id
+      assert user_role.organisation_id == org.id
+      assert user_role.scope == :organisation
+    end
+
+    test "assigns global role" do
+      user = Factory.insert!(:user)
+      role = Factory.insert!(:role)
+      {:ok, user_role} = Accounts.assign_role_to_user(user.id, role.id)
+      assert user_role.role_id == role.id
+      refute user_role.organisation_id
+      assert user_role.scope == :global
+    end
+
+    test "ensure global roles  are unique" do
+      user = Factory.insert!(:user)
+      role = Factory.insert!(:role)
+      Factory.insert!(:user_role, user: user, role: role)
+
+      {:error, changeset} = Accounts.assign_role_to_user(user.id, role.id)
+      assert %{user_id: ["User already has this global role"]} = errors_on(changeset)
+    end
+
+    test "ensure organisation roles are unique" do
+      user = Factory.insert!(:user)
+      organisation = Factory.insert!(:organization)
+      role = Factory.insert!(:role)
+      Factory.insert!(:user_role, user: user, role: role, organisation: organisation)
+      Factory.insert!(:organization_user, user: user, organisation: organisation)
+
+      {:error, changeset} = Accounts.assign_role_to_user(user.id, role.id, organisation.id)
+
+      assert %{user_id: ["User already has this role in this organisation"]} ==
+               errors_on(changeset)
+    end
+  end
 end

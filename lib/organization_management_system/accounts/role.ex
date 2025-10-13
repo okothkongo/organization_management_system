@@ -32,6 +32,10 @@ defmodule OrganizationManagementSystem.Accounts.Role do
     |> validate_required([:name, :scope, :description, :permission_id])
     |> put_change(:created_by_id, scope.user.id)
     |> validate_organisation()
+    |> unique_constraint(:name,
+      name: :roles_global_name_idx,
+      message: "has already been taken for global scope"
+    )
   end
 
   def validate_organisation(%Ecto.Changeset{changes: %{scope: scope}} = changeset) do

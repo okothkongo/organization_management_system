@@ -157,10 +157,17 @@ defmodule OrganizationManagementSystemWeb.Layouts do
             </.link>
             <%= if @current_scope.user.is_super_user? do %>
               <.link
+                navigate={~p"/permissions"}
+                class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
+              >
+                <.icon name="hero-shield-check" class="mr-4 size-6 shrink-0 text-primary-200" />
+                Permissions
+              </.link>
+              <.link
                 navigate={~p"/roles"}
                 class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
               >
-                <.icon name="hero-users" class="mr-4 size-6 shrink-0 text-primary-200" /> Roles
+                <.icon name="hero-user-circle" class="mr-4 size-6 shrink-0 text-primary-200" /> Roles
               </.link>
             <% end %>
             <%= if Abilities.can_review_or_approve?(@current_scope.user) do %>
@@ -168,7 +175,7 @@ defmodule OrganizationManagementSystemWeb.Layouts do
                 navigate={~p"/users"}
                 class="group flex items-center rounded-md px-2 py-2 text-sm font-medium text-primary-100 hover:bg-primary-700 hover:text-white"
               >
-                <.icon name="hero-user-plus" class="mr-4 size-6 shrink-0 text-primary-200" /> Users
+                <.icon name="hero-users" class="mr-4 size-6 shrink-0 text-primary-200" /> Users
               </.link>
             <% end %>
 
